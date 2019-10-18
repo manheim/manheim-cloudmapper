@@ -11,10 +11,10 @@ RUN apt-get install -y bash
 RUN git clone https://github.com/duo-labs/cloudmapper.git /opt/cloudmapper
 
 RUN mkdir /opt/cloudmapper/port_check
-COPY cloudmapper/* /opt/cloudmapper/
+COPY manheim_cloudmapper/* /opt/cloudmapper/
 
-COPY cloudmapper/port_check/ /opt/cloudmapper/port_check/
-COPY cloudmapper/ses/ /opt/cloudmapper/ses/
+COPY manheim_cloudmapper/port_check/ /opt/cloudmapper/port_check/
+COPY manheim_cloudmapper/ses/ /opt/cloudmapper/ses/
 
 RUN chmod +x /opt/cloudmapper/cloudmapper.sh
 
