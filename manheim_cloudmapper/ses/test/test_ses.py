@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from mock import patch, call, Mock, mock_open
+from mock import patch, call, Mock, mock_open, ANY
 import pytest
 import yaml
 import os
@@ -33,23 +33,27 @@ class TestSES(object):
             ]
         
     def test_send_email(self):
-        with patch('%s.MIMEMultipart' % pbm) as mock_mimemultipart, \
-             patch('%s.MIMEText' % pbm) as mock_mimetext, \
-             patch('%s.MIMEApplication' % pbm) as mock_mimeapp, \
-             patch('%s.ClientError' % pbm) as mock_clienterror, \
-             patch('%s.open' % pbm, mock_open(read_data='<html>test</html>'), create=True) as m_open:
-                cls = SES(region='us-east-1')
-                cls.send_email(
-                        sender='foo@maheim.com',
-                        recipient='bar@manheim.com',
-                        subject='foo',
-                        body_text='body',
-                        body_html='<html></html>',
-                        attachments=['report.html'])
-                assert mock_mimemultipart.mock_calls == [
-                    call('mixed')
-                ]
-                assert m_open.mock_calls == [
-                    call().open('report.hmtl', 'rb')
-                ]
+        with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+            patch('%s.boto3.client' % pbm) as mock_boto:
+            mock_boto.return_value.get_caller_identity.return_value = {
+                'UserId': 'MyUID',
+                'Arn': 'myARN',
+                'Account': '1234567890'  
+            }
+            cls = SES(region='us-east-1')
+            cls.send_email(
+                    sender='foo@maheim.com',
+                    recipient='bar@manheim.com',
+                    subject='foo',
+                    body_text='body',
+                    body_html='<html></html>',
+                    attachments=['report.html'])
+            mock_boto.assert_has_calls([
+                call('ses', region_name='us-east-1'),
+                call().send_raw_email(Destinations=['bar@manheim.com'], RawMessage={'Data': ANY}, Source='foo@maheim.com')
+            ])
+            assert m_open.mock_calls == [
+                call('report.html', 'rb'),
+                call().read()
+            ]
                 
