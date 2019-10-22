@@ -15,6 +15,7 @@
 from mock import patch, call, Mock, mock_open
 import pytest
 import yaml
+import os
 
 from manheim_cloudmapper.ses.report import Report
 
@@ -34,5 +35,22 @@ class TestReport(object):
         assert cls.account_name == 'foo'
         assert cls.sender == 'foo@maheim.com'
         assert cls.recipient == 'bar@manheim.com'
+        assert cls.region == 'us-east-1'
+        assert cls.ses_enabled == 'true'
+    
+    def test_init_with_env(self):
+        with patch('%s.logger' % pbm, autospec=True) as mock_logger:
+            with patch.dict(os.environ, {
+                'ACCOUNT': 'foo',
+                'SES_SENDER': 'foo@maheim.com',
+                'SES_RECIPIENT': 'bar@manheim.com',
+                'AWS_REGION': 'us-east-1',
+                'SES_ENABLED': 'true'
+            }, clear=True):
+                cls = Report()
+        assert cls.report_source == '/opt/cloudmapper/web/account-data/report.html'
+        assert cls.account_name == 'foo'
+        assert cls.sender == 'foo@maheim.com'
+        assert cls.recipient == 'AWS SES <bar@manheim.com>'
         assert cls.region == 'us-east-1'
         assert cls.ses_enabled == 'true'
