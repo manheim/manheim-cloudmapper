@@ -1,10 +1,12 @@
 import os
 import boto3
+import logging
 from botocore.exceptions import ClientError
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
+logger = logging.getLogger(__name__)
 class SES():
 
     # The character encoding for the email.
@@ -93,8 +95,11 @@ class SES():
         # Display an error if something goes wrong.	
         except ClientError as e:
             print(e.response['Error']['Message'])
+            logger.error(e.response['Error']['Message'])
         else:
-            print("Email sent! Message ID:"),
-            print(response['MessageId'])
+            logger.info("Email sent!")
+            logger.info ("Message ID: " + response['MessageId'])
+            #print("Email sent! Message ID:"),
+            #print(response['MessageId'])
 
 
