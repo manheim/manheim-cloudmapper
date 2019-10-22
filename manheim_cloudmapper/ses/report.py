@@ -3,9 +3,12 @@ import datetime
 import premailer
 import re
 import shutil
+import logging
 from tempfile import mkstemp
 from premailer import transform
 from .ses import SES
+
+logger = logging.getLogger(__name__)
 
 class Report():
     
@@ -61,6 +64,7 @@ class Report():
 
         if self.ses_enabled != "true":
             print("Skipping Cloudmapper SES Email send because SES is not enabled.")
+            logger.info("Skipping Cloudmapper SES Email send because SES is not enabled.")
             return
 
         subject = '[cloudmapper ' + self.account_name + '] Cloudmapper audit findings'
@@ -79,6 +83,7 @@ class Report():
             body_html = html.read()
 
         attachments = [out_file]
+        logger.info("Sengind SES Email.")
         self.ses.send_email(self.sender, self.recipient, subject, body_text, body_html, attachments)
 
     def js_replace(self, source):
