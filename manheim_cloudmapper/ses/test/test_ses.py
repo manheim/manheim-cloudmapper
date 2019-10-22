@@ -33,21 +33,23 @@ class TestSES(object):
             ]
         
     def test_send_email(self):
-        with patch('%s.MIMEMultipart' % pbm) as mock_mimemultipart:
-            with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open:
-                m_open.return_value = b'<html>hello</html>'
+        with patch('%s.MIMEMultipart' % pbm) as mock_mimemultipart, \
+             patch('%s.MIMEText' % pbm) as mock_mimetext, \
+             patch('%s.MIMEApplication' % pbm) as mock_mimeapp, \
+             patch('%s.ClientError' % pbm) as mock_clienterror, \
+             patch('%s.open' % pbm, mock_open(read_data='<html>test</html>'), create=True) as m_open:
                 cls = SES(region='us-east-1')
                 cls.send_email(
-                    sender='foo@maheim.com',
-                    recipient='bar@manheim.com',
-                    subject='foo',
-                    body_text='body',
-                    body_html='<html></html>',
-                    attachments=['report.html'])
-        assert mock_mimemultipart.mock_calls == [
-            call('mixed')
-        ]
-        assert m_open.mock_calls == [
-            call().open('report.hmtl', 'rb')
-        ]
-        
+                        sender='foo@maheim.com',
+                        recipient='bar@manheim.com',
+                        subject='foo',
+                        body_text='body',
+                        body_html='<html></html>',
+                        attachments=['report.html'])
+                assert mock_mimemultipart.mock_calls == [
+                    call('mixed')
+                ]
+                assert m_open.mock_calls == [
+                    call().open('report.hmtl', 'rb')
+                ]
+                
