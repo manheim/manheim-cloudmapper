@@ -152,4 +152,90 @@ class TestReport(object):
 
             os.remove(cloudmapper_filename)
     
-    #def test_js_replace(self):
+    def test_js_replace(self):
+        with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+            patch('%s.boto3.client' % ses) as mock_boto, \
+            patch.dict(os.environ, {
+                'ACCOUNT': 'foo',
+                'SES_SENDER': 'foo@maheim.com',
+                'SES_RECIPIENT': 'bar@manheim.com',
+                'AWS_REGION': 'us-east-1',
+                'SES_ENABLED': 'true'
+            }, clear=True):
+            
+            cls = Report()
+            cls.js_replace('/opt/cloudmapper/web/account-data/report.html')
+
+            assert m_open.mock_calls == [
+                call('/opt/cloudmapper/web/account-data/report.html', 'r'),
+                call().read(),
+                call().close(),
+                call('/opt/cloudmapper/web/js/chart.js', 'r'),
+                call().read(),
+                call().close(),
+                call('/opt/cloudmapper/web/js/report.js', 'r'),
+                call().read(),
+                call().close(),
+                call('/opt/cloudmapper/web/account-data/report.html', 'w'),
+                call().write('foo'),
+                call().close()
+            ]
+        
+    def test_css_js_fix(self):
+        with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+            patch('%s.boto3.client' % ses) as mock_boto, \
+            patch.dict(os.environ, {
+                'ACCOUNT': 'foo',
+                'SES_SENDER': 'foo@maheim.com',
+                'SES_RECIPIENT': 'bar@manheim.com',
+                'AWS_REGION': 'us-east-1',
+                'SES_ENABLED': 'true'
+            }, clear=True):
+
+            now = datetime.datetime.now()
+            cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
+            with open(cloudmapper_filename, 'w+') as html:
+                html.write('bar')
+
+            cls = Report()
+            cls.css_js_fix(cloudmapper_filename)
+
+            assert m_open.mock_calls == [
+                call(cloudmapper_filename, 'r'),
+                call().read(),
+                call().close(),
+                call(cloudmapper_filename, 'w'),
+                call().write('foo'),
+                call().close()
+            ]
+
+            os.remove(cloudmapper_filename)
+
+    def test_premailer_transform(self):
+        with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+            patch('%s.boto3.client' % ses) as mock_boto, \
+            patch.dict(os.environ, {
+                'ACCOUNT': 'foo',
+                'SES_SENDER': 'foo@maheim.com',
+                'SES_RECIPIENT': 'bar@manheim.com',
+                'AWS_REGION': 'us-east-1',
+                'SES_ENABLED': 'true'
+            }, clear=True):
+
+            now = datetime.datetime.now()
+            cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
+            
+            cls = Report()
+            cls.premailer_transform('/opt/cloudmapper/web/account-data/report.html')
+
+            assert m_open.mock_calls == [
+                call('/opt/cloudmapper/web/account-data/report.html', 'r'),
+                call().__enter__(),
+                call('/opt/cloudmapper/' + cloudmapper_filename, 'w+'),
+                call().__enter__(),
+                call().read(),
+                call().write('<html><head></head><body><p>foo</p></body></html>'),
+                call().__exit__(None, None, None),
+                call().__exit__(None, None, None)
+            ]
+            
