@@ -63,7 +63,6 @@ class Report():
         """
 
         if self.ses_enabled != "true":
-            print("Skipping Cloudmapper SES Email send because SES is not enabled.")
             logger.info("Skipping Cloudmapper SES Email send because SES is not enabled.")
             return
 
