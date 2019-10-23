@@ -16,10 +16,12 @@ from mock import patch, call, Mock, mock_open
 import pytest
 import yaml
 import os
+import datetime
 
 from manheim_cloudmapper.ses.report import Report
 
 pbm = 'manheim_cloudmapper.ses.report'
+ses = 'manheim_cloudmapper.ses.ses'
 
 class TestReport(object):
 
@@ -45,7 +47,7 @@ class TestReport(object):
                 'AWS_REGION': 'us-east-1',
                 'SES_ENABLED': 'true'
             }, clear=True):
-                cls = Report()
+            cls = Report()
         assert cls.report_source == '/opt/cloudmapper/web/account-data/report.html'
         assert cls.account_name == 'foo'
         assert cls.sender == 'foo@maheim.com'
@@ -53,5 +55,65 @@ class TestReport(object):
         assert cls.region == 'us-east-1'
         assert cls.ses_enabled == 'true'
     
-    #def test_generate_and_send_email(self):
-    #    with patch('%s.logger' % pbm, autospec=True) as mock_logger:
+    def test_generate_and_send_email(self):
+        with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
+            patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+            patch('%s.boto3.client' % ses) as mock_boto, \
+            patch.dict(os.environ, {
+                'ACCOUNT': 'foo',
+                'SES_SENDER': 'foo@maheim.com',
+                'SES_RECIPIENT': 'bar@manheim.com',
+                'AWS_REGION': 'us-east-1',
+                'SES_ENABLED': 'true'
+            }, clear=True):
+
+            mock_boto.return_value.get_caller_identity.return_value = {
+                'UserId': 'MyUID',
+                'Arn': 'myARN',
+                'Account': '1234567890'  
+            }
+
+            now = datetime.datetime.now()
+            cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
+            with open(cloudmapper_filename, 'w+') as html:
+                html.write('bar')
+            
+            cls = Report()
+            cls.generate_and_send_email()
+
+            assert m_open.mock_calls == [
+                call('/opt/cloudmapper/web/account-data/report.html', 'r'),
+                call().read(),
+                call().close(),
+                call('/opt/cloudmapper/web/js/chart.js', 'r'),
+                call().read(),
+                call().close(),
+                call('/opt/cloudmapper/web/js/report.js', 'r'),
+                call().read(),
+                call().close(),
+                call('/opt/cloudmapper/web/account-data/report.html', 'w'),
+                call().write('foo'),
+                call().close(),
+                call('/opt/cloudmapper/web/account-data/report.html', 'r'),
+                call().__enter__(),
+                call('/opt/cloudmapper/' + cloudmapper_filename, 'w+'),
+                call().__enter__(),
+                call().read(),
+                call().write('<html><head></head><body><p>foo</p></body></html>'),
+                call().__exit__(None, None, None),
+                call().__exit__(None, None, None),
+                call(cloudmapper_filename, 'r'),
+                call().read(),
+                call().close(),
+                call(cloudmapper_filename, 'w'),
+                call().write('foo'),
+                call().close(),
+                call(cloudmapper_filename, 'r'),
+                call().__enter__(),
+                call().read(),
+                call().__exit__(None, None, None)
+            ]
+
+            os.remove(cloudmapper_filename)
+
+            
