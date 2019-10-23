@@ -80,7 +80,6 @@ class SES():
             # Add the attachment to the parent container.
             msg.attach(att)
 
-        #print(msg)
         try:
             #Provide the contents of the email.
             response = self.client.send_raw_email(
@@ -94,12 +93,9 @@ class SES():
             )
         # Display an error if something goes wrong.	
         except ClientError as e:
-            print(e.response['Error']['Message'])
             logger.error(e.response['Error']['Message'])
         else:
             logger.info("Email sent!")
             logger.info ("Message ID: " + response['MessageId'])
-            #print("Email sent! Message ID:"),
-            #print(response['MessageId'])
 
 

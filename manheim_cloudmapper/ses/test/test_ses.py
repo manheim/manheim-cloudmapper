@@ -62,39 +62,4 @@ class TestSES(object):
             mock_logger.assert_has_calls([
                 call.info('Email sent!')
             ])
-
-    def test_send_email_fails(self):
-        with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-            patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
-            patch('%s.boto3.client' % pbm) as mock_boto, \
-            patch('%s.boto3.client.send_raw_email' % pbm, side_effect=ClientError({'Error': {'Code': 'ResourceInUseException'}}, 'create_stream')) :
-            mock_boto.return_value.get_caller_identity.return_value = {
-                'UserId': 'MyUID',
-                'Arn': 'myARN',
-                'Account': '1234567890'  
-            }
-            cls = SES(region='us-east-1')
-            cls.send_email(
-                    sender='foo@maheim.com',
-                    recipient='bar@manheim.com',
-                    subject='foo',
-                    body_text='body',
-                    body_html='<html></html>',
-                    attachments=['report.html'])
-
-            #with pytest.raises(ClientError) as ce:
-            #    print(ce)
-            #    assert ce.response == 'ResourceInUseException'
-
-
-            #mock_boto.assert_has_calls([
-            #    call('ses', region_name='us-east-1'),
-            #    call().send_raw_email(Destinations=['bar@manheim.com'], RawMessage={'Data': ANY}, Source='foo@maheim.com')
-            #])
-            #assert m_open.mock_calls == [
-            #    call('report.html', 'rb'),
-            #    call().read()
-            #]
-            mock_logger.assert_has_calls([
-                call.error('Error')
-            ])
+            

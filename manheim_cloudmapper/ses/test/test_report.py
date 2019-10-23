@@ -24,13 +24,12 @@ pbm = 'manheim_cloudmapper.ses.report'
 class TestReport(object):
 
     def test_init(self):
-        with patch('%s.logger' % pbm, autospec=True) as mock_logger:
-            cls = Report(
-                    report_source='/opt/cloudmapper/web/account-data/report.html',
-                    account_name='foo',
-                    sender='foo@maheim.com', recipient='bar@manheim.com',
-                    region='us-east-1',
-                    ses_enabled='true')
+        cls = Report(
+                report_source='/opt/cloudmapper/web/account-data/report.html',
+                account_name='foo',
+                sender='foo@maheim.com', recipient='bar@manheim.com',
+                region='us-east-1',
+                ses_enabled='true')
         assert cls.report_source == '/opt/cloudmapper/web/account-data/report.html'
         assert cls.account_name == 'foo'
         assert cls.sender == 'foo@maheim.com'
@@ -39,8 +38,7 @@ class TestReport(object):
         assert cls.ses_enabled == 'true'
     
     def test_init_with_env(self):
-        with patch('%s.logger' % pbm, autospec=True) as mock_logger:
-            with patch.dict(os.environ, {
+        with patch.dict(os.environ, {
                 'ACCOUNT': 'foo',
                 'SES_SENDER': 'foo@maheim.com',
                 'SES_RECIPIENT': 'bar@manheim.com',
@@ -54,3 +52,6 @@ class TestReport(object):
         assert cls.recipient == 'AWS SES <bar@manheim.com>'
         assert cls.region == 'us-east-1'
         assert cls.ses_enabled == 'true'
+    
+    #def test_generate_and_send_email(self):
+    #    with patch('%s.logger' % pbm, autospec=True) as mock_logger:
