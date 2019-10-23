@@ -12,14 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from mock import patch, call, Mock, mock_open, ANY
-from botocore.exceptions import ClientError
+import sys
 import pytest
 import yaml
 import os
 import boto3
-
 from manheim_cloudmapper.ses.ses import SES
+from botocore.exceptions import ClientError
+
+# https://code.google.com/p/mock/issues/detail?id=249
+# py>=3.4 should use unittest.mock not the mock package on pypi
+if (
+        sys.version_info[0] < 3 or
+        sys.version_info[0] == 3 and sys.version_info[1] < 4
+):
+    from mock import patch, call, Mock, mock_open, ANY
+else:
+    from unittest.mock import patch, call, Mock, mock_open, ANY
 
 pbm = 'manheim_cloudmapper.ses.ses'
 
@@ -62,4 +71,3 @@ class TestSES(object):
             mock_logger.assert_has_calls([
                 call.info('Email sent!')
             ])
-            
