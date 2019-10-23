@@ -31,6 +31,13 @@ class PagerDutyV1():
         if service_key is None:
             service_key = os.environ.get('PD_SERVICE_KEY', None)
         self._service_key = service_key
+
+        if self._service_key is None:
+            raise RuntimeError(
+                'ERROR: PagerDutyV1 alert provider requires '
+                'service_key parameter or PD_SERVICE_KEY '
+                'environment variable.'
+            )
         
         if incident_key is None:
             incident_key = 'cloudmapper-' + account_name
@@ -95,7 +102,8 @@ class PagerDutyV1():
         data['event_type'] = 'resolve'
         data['description'] = 'cloudmapper in '
         if self._account_name is not None:
-            data['description'] += self._account_name + ' found no problems'
+            data['description'] += self._account_name
+        data['description'] += ' found no problems'
         self._send_event(self._service_key, data)
 
     def on_failure(self, problem_str, exc=None):
@@ -113,7 +121,7 @@ class PagerDutyV1():
         if self._account_name is not None:
             data['description'] += self._account_name + ' '
         if exc is not None:
-            data['description'] += ' failed with an exception:' \
+            data['description'] += 'failed with an exception:' \
                                    ' %s' % exc.__repr__()
             data['details']['exception'] = exc.__repr__()
         else:
