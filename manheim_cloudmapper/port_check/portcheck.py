@@ -44,7 +44,7 @@ class PortCheck():
         for port in ports:
             if port not in self.ok_ports:
                 bad_ports.append(port)
-        return bad_ports
+        return ",".join(bad_ports)
 
     def check_ports(self):
         """
@@ -56,11 +56,10 @@ class PortCheck():
 
         If no bad ports are found, resolve the issue in PagerDuty.
         """
-        sys.stdin = open(self.filename_in, 'r')
 
         problem_str = ''
 
-        with sys.stdin as data:
+        with open(self.filename_in, 'r') as data:
             csv_filename = self.account_name + '.csv'
 
             json_data = json.load(data)
@@ -71,19 +70,21 @@ class PortCheck():
             with open(csv_filename) as csv_file:
                 lines = csv.reader(csv_file, delimiter=',')
                 for line in lines:
+                    print("line: ")
+                    print(line)
                     account = line[0]
                     aws_type = line[1]
                     hostname = line[2]
                     port_list = line[3]
+                    print(port_list)
                     arn = line[4]
-                
+                    print(arn)
+
                     ports = port_list.split(',')
-                
                     bad_ports = self.get_bad_ports(ports)
-                    bad_ports = ",".join(bad_ports)
                 
                     if bad_ports:
-                        print("%s\t%s\t%s\t%s\t%s" % (account,aws_type,hostname,bad_ports.encode("ascii"),arn))
+                        logger.info("%s\t%s\t%s\t%s\t%s" % (account,aws_type,hostname,bad_ports.encode("ascii"),arn))
                         problem_str += ("%s\t%s\t%s\t%s\t%s" % (account,aws_type,hostname,bad_ports.encode("ascii"),arn) + '\n')
             
         if problem_str == '':
