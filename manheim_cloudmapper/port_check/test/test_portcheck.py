@@ -51,7 +51,8 @@ class PortCheckTester(object):
 class TestGetBadPorts(PortCheckTester):
 
     def test_get_bad_ports(self):
-        bad_ports = self.cls.get_bad_ports('80,443,1999,22,80,432,12435,443'.split(','))
+        bad_ports = self.cls.get_bad_ports(
+            '80,443,1999,22,80,432,12435,443'.split(','))
         assert bad_ports == '1999,22,432,12435'
 
     def test_get_bad_ports_empty(self):
@@ -62,17 +63,31 @@ class TestGetBadPorts(PortCheckTester):
 class TestCheckBadPorts(PortCheckTester):
 
     def test_check_bad_ports(self):
-        json_data = ('[{"account": "acct","arn": "abc123","hostname": "abc123.execute-api.us-east-1.amazonaws.com","ports": "80,443,22,1999","type": "apigateway"},'
-                     '{"account": "acct","arn": "abc567","hostname": "abc567.execute-api.us-east-1.amazonaws.com","ports": "80,443,22,1999","type": "apigateway"},'
-                     '{"account": "acct","arn": "abc890","hostname": "abc890.execute-api.us-east-1.amazonaws.com","ports": "80,443,22,1999","type": "apigateway"}]')
-        csv_data = ('acct,apigateway,abc123.execute-api.us-east-1.amazonaws.com,"80,443,22,1999",abc123\n'
-                    'acct,apigateway,abc567.execute-api.us-east-1.amazonaws.com,"80,443,22,1999",abc567\n'
-                    'acct,apigateway,abc890.execute-api.us-east-1.amazonaws.com,"80,443,22,1999",abc890')
+        json_data = ('[{"account": "acct","arn": "abc123","hostname": '
+                     '"abc123.execute-api.us-east-1.amazonaws.com",'
+                     '"ports": "80,443,22,1999","type": "apigateway"},'
+                     '{"account": "acct","arn": "abc567","hostname": '
+                     '"abc567.execute-api.us-east-1.amazonaws.com",'
+                     '"ports": "80,443,22,1999","type": "apigateway"},'
+                     '{"account": "acct","arn": "abc890","hostname": '
+                     '"abc890.execute-api.us-east-1.amazonaws.com",'
+                     '"ports": "80,443,22,1999","type": "apigateway"}]')
+        csv_data = ('acct,apigateway,'
+                    'abc123.execute-api.us-east-1.amazonaws.com,'
+                    '"80,443,22,1999",abc123\n'
+                    'acct,apigateway,'
+                    'abc567.execute-api.us-east-1.amazonaws.com,'
+                    '"80,443,22,1999",abc567\n'
+                    'acct,apigateway,'
+                    'abc890.execute-api.us-east-1.amazonaws.com,'
+                    '"80,443,22,1999",abc890')
 
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-                patch('%s.open' % pbm, mock_open(read_data=json_data), create=True) as m_open:
+                patch('%s.open' % pbm, mock_open(read_data=json_data),
+                      create=True) as m_open:
 
-            m_open.side_effect = (m_open.return_value, mock_open(read_data=csv_data).return_value)
+            m_open.side_effect = (m_open.return_value,
+                                  mock_open(read_data=csv_data).return_value)
 
             self.cls.check_ports()
 
@@ -85,25 +100,45 @@ class TestCheckBadPorts(PortCheckTester):
             ])
 
             mock_logger.assert_has_calls([
-                call.info("acct\tapigateway\tabc123.execute-api.us-east-1.amazonaws.com\tb'22,1999'\tabc123"),
-                call.info("acct\tapigateway\tabc567.execute-api.us-east-1.amazonaws.com\tb'22,1999'\tabc567"),
-                call.info("acct\tapigateway\tabc890.execute-api.us-east-1.amazonaws.com\tb'22,1999'\tabc890")
+                call.info("acct\tapigateway\t"
+                          "abc123.execute-api.us-east-1.amazonaws.com\t"
+                          "b'22,1999'\tabc123"),
+                call.info("acct\tapigateway\t"
+                          "abc567.execute-api.us-east-1.amazonaws.com\t"
+                          "b'22,1999'\tabc567"),
+                call.info("acct\tapigateway\t"
+                          "abc890.execute-api.us-east-1.amazonaws.com\t"
+                          "b'22,1999'\tabc890")
             ])
 
             os.remove('aName.csv')
 
     def test_check_bad_ports_empty(self):
-        json_data = ('[{"account": "acct","arn": "abc123","hostname": "abc123.execute-api.us-east-1.amazonaws.com","ports": "80,443","type": "apigateway"},'
-                     '{"account": "acct","arn": "abc567","hostname": "abc567.execute-api.us-east-1.amazonaws.com","ports": "80,443","type": "apigateway"},'
-                     '{"account": "acct","arn": "abc890","hostname": "abc890.execute-api.us-east-1.amazonaws.com","ports": "80,443","type": "apigateway"}]')
-        csv_data = ('acct,apigateway,abc123.execute-api.us-east-1.amazonaws.com,"80,443",abc123\n'
-                    'acct,apigateway,abc567.execute-api.us-east-1.amazonaws.com,"80,443",abc567\n'
-                    'acct,apigateway,abc890.execute-api.us-east-1.amazonaws.com,"80,443",abc890')
+        json_data = ('[{"account": "acct","arn": "abc123","hostname": '
+                     '"abc123.execute-api.us-east-1.amazonaws.com",'
+                     '"ports": "80,443","type": "apigateway"},'
+                     '{"account": "acct","arn": "abc567","hostname": '
+                     '"abc567.execute-api.us-east-1.amazonaws.com",'
+                     '"ports": "80,443","type": "apigateway"},'
+                     '{"account": "acct","arn": "abc890","hostname": '
+                     '"abc890.execute-api.us-east-1.amazonaws.com",'
+                     '"ports": "80,443","type": "apigateway"}]')
+        csv_data = ('acct,apigateway,'
+                    'abc123.execute-api.us-east-1.amazonaws.com,'
+                    '"80,443",abc123\n'
+                    'acct,apigateway,'
+                    'abc567.execute-api.us-east-1.amazonaws.com,'
+                    '"80,443",abc567\n'
+                    'acct,apigateway,'
+                    'abc890.execute-api.us-east-1.amazonaws.com,'
+                    '"80,443",abc890')
 
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-                patch('%s.open' % pbm, mock_open(read_data=json_data), create=True) as m_open:
+                patch('%s.open' % pbm,
+                      mock_open(read_data=json_data), create=True) as m_open:
 
-            m_open.side_effect = (m_open.return_value, mock_open(read_data=csv_data).return_value)
+            m_open.side_effect = (m_open.return_value,
+                                  mock_open(read_data=csv_data).return_value)
 
             self.cls.check_ports()
 
