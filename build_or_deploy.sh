@@ -17,7 +17,7 @@ set -x
 set -e
 
 if [ -z "$1" ]; then
-    >&2 echo "USAGE: build_or_deploy.sh [build|dockerbuild|push|dockerpush|dockerbuildtest]"
+    >&2 echo "USAGE: build_or_deploy.sh [build|dockerbuild|push|dockerbuildtest]"
     exit 1
 fi
 
@@ -58,14 +58,6 @@ function dockerbuildtest {
     ./dockertest.sh "manheim/manheim-cloudmapper:${tag}"
 }
 
-function dockerpush {
-    tag=$(gettag)
-    echo "Pushing Docker image..."
-    docker push manheim/manheim-cloudmapper:latest
-    docker push manheim/manheim-cloudmapper:$tag
-    echo "Pushed image and tagged as: manheim/manheim-cloudmapper:${tag}"
-}
-
 function pythonbuild {
     rm -Rf dist
     python setup.py sdist bdist_wheel
@@ -83,11 +75,9 @@ elif [[ "$1" == "dockerbuild" ]]; then
     dockertoxbuild
 elif [[ "$1" == "push" ]]; then
     pythonpush
-elif [[ "$1" == "dockerpush" ]]; then
-    dockerpush
 elif [[ "$1" == "dockerbuildtest" ]]; then
     dockerbuildtest
 else
-    >&2 echo "USAGE: do_docker.sh [build|dockerbuild|push|dockerpush|dockerbuildtest]"
+    >&2 echo "USAGE: do_docker.sh [build|dockerbuild|push|dockerbuildtest]"
     exit 1
 fi
