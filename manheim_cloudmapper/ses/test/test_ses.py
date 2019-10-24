@@ -32,6 +32,7 @@ else:
 
 pbm = 'manheim_cloudmapper.ses.ses'
 
+
 class TestSES(object):
 
     def test_init(self):
@@ -41,15 +42,15 @@ class TestSES(object):
             assert mock_boto.mock_calls == [
                 call('ses', region_name='us-east-1')
             ]
-        
+
     def test_send_email(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-            patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
-            patch('%s.boto3.client' % pbm) as mock_boto:
+                patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+                patch('%s.boto3.client' % pbm) as mock_boto:
             mock_boto.return_value.get_caller_identity.return_value = {
                 'UserId': 'MyUID',
                 'Arn': 'myARN',
-                'Account': '1234567890'  
+                'Account': '1234567890'
             }
             cls = SES(region='us-east-1')
             cls.send_email(

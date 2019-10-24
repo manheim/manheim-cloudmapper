@@ -10,8 +10,9 @@ from .ses import SES
 
 logger = logging.getLogger(__name__)
 
+
 class Report():
-    
+
     # Base path for CSS stylings, default for cloudmapper
     BASE_PATH = '/opt/cloudmapper/web/css'
 
@@ -36,7 +37,7 @@ class Report():
 
         if sender is None:
             sender = os.environ.get('SES_SENDER', None)
-    
+
         if recipient is None:
             recipient = 'AWS SES <' + os.environ.get('SES_RECIPIENT', None) + '>'
 
@@ -53,7 +54,7 @@ class Report():
         self.ses_enabled = ses_enabled
 
         self.ses = SES(self.region)
-    
+
     def generate_and_send_email(self):
         """
         Generate Cloudmapper Email and send via AWS SES
@@ -113,7 +114,7 @@ class Report():
         new_html = open(source, 'w')
         new_html.write(new_html_data)
         new_html.close()
-    
+
     def css_js_fix(self, source):
         """
         Adds additional CSS to support formatting of JS tables
@@ -141,7 +142,6 @@ class Report():
         new_html = open(source, 'w')
         new_html.write(new_html_data)
         new_html.close()
-
 
     def premailer_transform(self, source):
         """

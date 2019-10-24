@@ -33,6 +33,7 @@ else:
 pbm = 'manheim_cloudmapper.ses.report'
 ses = 'manheim_cloudmapper.ses.ses'
 
+
 class TestReport(object):
 
     def test_init(self):
@@ -48,7 +49,7 @@ class TestReport(object):
         assert cls.recipient == 'bar@manheim.com'
         assert cls.region == 'us-east-1'
         assert cls.ses_enabled == 'true'
-    
+
     def test_init_with_env(self):
         with patch.dict(os.environ, {
                 'ACCOUNT': 'foo',
@@ -56,7 +57,7 @@ class TestReport(object):
                 'SES_RECIPIENT': 'bar@manheim.com',
                 'AWS_REGION': 'us-east-1',
                 'SES_ENABLED': 'true'
-            }, clear=True):
+                }, clear=True):
             cls = Report()
         assert cls.report_source == '/opt/cloudmapper/web/account-data/report.html'
         assert cls.account_name == 'foo'
@@ -75,19 +76,19 @@ class TestReport(object):
                 'SES_RECIPIENT': 'bar@manheim.com',
                 'AWS_REGION': 'us-east-1',
                 'SES_ENABLED': 'false'
-            }, clear=True):
+                }, clear=True):
 
             mock_boto.return_value.get_caller_identity.return_value = {
                 'UserId': 'MyUID',
                 'Arn': 'myARN',
-                'Account': '1234567890'  
+                'Account': '1234567890'
             }
 
             now = datetime.datetime.now()
             cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
             with open(cloudmapper_filename, 'w+') as html:
                 html.write('bar')
-            
+
             cls = Report()
             cls.generate_and_send_email()
 
@@ -96,7 +97,7 @@ class TestReport(object):
             ])
             assert m_open.mock_calls == []
             os.remove(cloudmapper_filename)
-    
+
     def test_generate_and_send_email_enabled(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
             patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
@@ -107,19 +108,19 @@ class TestReport(object):
                 'SES_RECIPIENT': 'bar@manheim.com',
                 'AWS_REGION': 'us-east-1',
                 'SES_ENABLED': 'true'
-            }, clear=True):
+                }, clear=True):
 
             mock_boto.return_value.get_caller_identity.return_value = {
                 'UserId': 'MyUID',
                 'Arn': 'myARN',
-                'Account': '1234567890'  
+                'Account': '1234567890'
             }
 
             now = datetime.datetime.now()
             cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
             with open(cloudmapper_filename, 'w+') as html:
                 html.write('bar')
-            
+
             cls = Report()
             cls.generate_and_send_email()
 
@@ -161,7 +162,7 @@ class TestReport(object):
             ])
 
             os.remove(cloudmapper_filename)
-    
+
     def test_js_replace(self):
         with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
             patch('%s.boto3.client' % ses) as mock_boto, \
@@ -171,8 +172,8 @@ class TestReport(object):
                 'SES_RECIPIENT': 'bar@manheim.com',
                 'AWS_REGION': 'us-east-1',
                 'SES_ENABLED': 'true'
-            }, clear=True):
-            
+                }, clear=True):
+
             cls = Report()
             cls.js_replace('/opt/cloudmapper/web/account-data/report.html')
 
@@ -190,7 +191,7 @@ class TestReport(object):
                 call().write('foo'),
                 call().close()
             ]
-        
+
     def test_css_js_fix(self):
         with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
             patch('%s.boto3.client' % ses) as mock_boto, \
@@ -200,7 +201,7 @@ class TestReport(object):
                 'SES_RECIPIENT': 'bar@manheim.com',
                 'AWS_REGION': 'us-east-1',
                 'SES_ENABLED': 'true'
-            }, clear=True):
+                }, clear=True):
 
             now = datetime.datetime.now()
             cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
@@ -230,11 +231,11 @@ class TestReport(object):
                 'SES_RECIPIENT': 'bar@manheim.com',
                 'AWS_REGION': 'us-east-1',
                 'SES_ENABLED': 'true'
-            }, clear=True):
+                }, clear=True):
 
             now = datetime.datetime.now()
             cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
-            
+
             cls = Report()
             cls.premailer_transform('/opt/cloudmapper/web/account-data/report.html')
 
@@ -248,4 +249,3 @@ class TestReport(object):
                 call().__exit__(None, None, None),
                 call().__exit__(None, None, None)
             ]
-            

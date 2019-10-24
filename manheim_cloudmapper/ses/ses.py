@@ -7,15 +7,17 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
 logger = logging.getLogger(__name__)
+
+
 class SES():
 
     # The character encoding for the email.
     CHARSET = "utf-8"
 
     # Specify a configuration set. If you do not want to use a configuration
-    # set, comment the following variable, and the 
+    # set, comment the following variable, and the
     # ConfigurationSetName=CONFIGURATION_SET argument below.
-    #CONFIGURATION_SET = "ConfigSet"
+    # CONFIGURATION_SET = "ConfigSet"
 
     def __init__(self, region):
         """
@@ -27,7 +29,7 @@ class SES():
         self.region = region
 
         # Create a new SES resource
-        self.client = boto3.client('ses',region_name=region)
+        self.client = boto3.client('ses', region_name=region)
 
     def send_email(self, sender, recipient, subject, body_text, body_html, attachments):
         """
@@ -50,7 +52,7 @@ class SES():
         # Create a multipart/mixed parent container.
         msg = MIMEMultipart('mixed')
         # Add subject, from and to lines.
-        msg['Subject'] = subject 
+        msg['Subject'] = subject
         msg['From'] = sender
         msg['To'] = recipient
 
@@ -71,7 +73,7 @@ class SES():
 
             # Add a header to tell the email client to treat this part as an attachment,
             # and to give the attachment a name.
-            att.add_header('Content-Disposition','attachment',filename=os.path.basename(attachment))
+            att.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment))
 
             # Attach the multipart/alternative child container to the multipart/mixed
             # parent container.
@@ -81,21 +83,19 @@ class SES():
             msg.attach(att)
 
         try:
-            #Provide the contents of the email.
+            # Provide the contents of the email.
             response = self.client.send_raw_email(
                 Source=sender,
                 Destinations=[
                     recipient
                 ],
                 RawMessage={
-                    'Data':msg.as_string(),
+                    'Data': msg.as_string(),
                 }
             )
-        # Display an error if something goes wrong.	
+        # Display an error if something goes wrong.
         except ClientError as e:
             logger.error(e.response['Error']['Message'])
         else:
             logger.info("Email sent!")
-            logger.info ("Message ID: " + response['MessageId'])
-
-
+            logger.info("Message ID: " + response['MessageId'])
