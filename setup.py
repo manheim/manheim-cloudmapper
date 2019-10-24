@@ -10,7 +10,9 @@ requires = [
     'tabulate>=0.8.0,<0.9.0',
     # for building generated policy docs
     'sphinx>=1.8.0,<1.9.0',
-    'sphinx_rtd_theme'
+    'sphinx_rtd_theme',
+    'pandas',
+    'premailer'
 ]
 
 classifiers = [
