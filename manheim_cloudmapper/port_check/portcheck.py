@@ -10,6 +10,7 @@ from .pagerdutyv1 import PagerDutyV1
 
 logger = logging.getLogger(__name__)
 
+
 class PortCheck():
 
     def __init__(self, ok_ports, account_name):
@@ -32,7 +33,7 @@ class PortCheck():
     def get_bad_ports(self, ports):
         """
         Compare the list of publicly acceible ports
-        to the ports that are acceptable. 
+        to the ports that are acceptable.
 
         Return any ports that should not be accessible.
 
@@ -65,7 +66,7 @@ class PortCheck():
             json_data = json.load(data)
             df = json_normalize(json_data)
             df = df[['account', 'type', 'hostname', 'ports', 'arn']]
-            df.to_csv(csv_filename,header=False,index=False)
+            df.to_csv(csv_filename, header=False, index=False)
 
             with open(csv_filename) as csv_file:
                 lines = csv.reader(csv_file, delimiter=',')
@@ -78,11 +79,11 @@ class PortCheck():
 
                     ports = port_list.split(',')
                     bad_ports = self.get_bad_ports(ports)
-                
+
                     if bad_ports:
-                        logger.info("%s\t%s\t%s\t%s\t%s" % (account,aws_type,hostname,bad_ports.encode("ascii"),arn))
-                        problem_str += ("%s\t%s\t%s\t%s\t%s" % (account,aws_type,hostname,bad_ports.encode("ascii"),arn) + '\n')
-            
+                        logger.info("%s\t%s\t%s\t%s\t%s" % (account, aws_type, hostname, bad_ports.encode("ascii"), arn))
+                        problem_str += ("%s\t%s\t%s\t%s\t%s" % (account, aws_type, hostname, bad_ports.encode("ascii"), arn) + '\n')
+
         if problem_str == '':
             self.pd.on_success()
         else:

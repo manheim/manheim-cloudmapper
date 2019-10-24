@@ -16,6 +16,7 @@ else:
 pbm = 'manheim_cloudmapper.port_check.pagerdutyv1'
 pb = '%s.PagerDutyV1' % pbm
 
+
 class TestInit(object):
 
     @patch.dict(
@@ -47,7 +48,8 @@ class TestInit(object):
                                  'service_key parameter or' \
                                  ' PD_SERVICE_KEY ' \
                                  'environment variable.'
-                            
+
+
 class PagerDutyV1Tester(object):
 
     def setup(self):
@@ -57,7 +59,8 @@ class PagerDutyV1Tester(object):
             self.cls._account_name = None
             self.cls._incident_key = 'iKey'
             self.cls._service_key = None
-        
+
+
 class TestSendEvent(PagerDutyV1Tester):
 
     def test_success(self):
@@ -105,6 +108,7 @@ class TestSendEvent(PagerDutyV1Tester):
             )
         ]
 
+
 class TestEventDict(PagerDutyV1Tester):
 
     def test_no_account_name(self):
@@ -121,7 +125,8 @@ class TestEventDict(PagerDutyV1Tester):
             'details': {'account_name': 'myAcct'},
             'client': 'cloudmapper'
         }
-    
+
+
 class TestOnSuccess(PagerDutyV1Tester):
 
     def test_happy_path(self):
@@ -141,7 +146,7 @@ class TestOnSuccess(PagerDutyV1Tester):
                                'no problems'
             })
         ]
-    
+
     def test_no_account_name(self):
         self.cls._service_key = 'cKey'
         with patch('%s._event_dict' % pb, autospec=True) as m_ed:
@@ -159,10 +164,11 @@ class TestOnSuccess(PagerDutyV1Tester):
             })
         ]
 
+
 class TestOnFailures(PagerDutyV1Tester):
 
     def test_failure_exception(self):
-        self.cls._account_name= 'aName'
+        self.cls._account_name = 'aName'
         self.cls._service_key = 'cKey'
         data = {'event': 'data', 'details': {}}
         exc = RuntimeError('foo')
@@ -189,7 +195,7 @@ class TestOnFailures(PagerDutyV1Tester):
         ]
 
     def test_failure(self):
-        self.cls._account_name= 'aName'
+        self.cls._account_name = 'aName'
         self.cls._service_key = 'cKey'
         data = {'event': 'data', 'details': {}}
         expected = {
@@ -209,8 +215,8 @@ class TestOnFailures(PagerDutyV1Tester):
             _send_event=DEFAULT
         ) as mocks:
             mocks['_event_dict'].return_value = data
-            problem_str = ("%s\t%s\t%s\t%s\t%s" % ('acct','apigateway','abc123.execute-api.us-east-1.amazonaws.com','80,443'.encode("ascii"),'abc1245') + '\n')
-            problem_str += ("%s\t%s\t%s\t%s\t%s" % ('acct','apigateway','www576.execute-api.us-east-1.amazonaws.com','80,443'.encode("ascii"),'wwwe8932') + '\n')
+            problem_str = ("%s\t%s\t%s\t%s\t%s" % ('acct', 'apigateway', 'abc123.execute-api.us-east-1.amazonaws.com', '80,443'.encode("ascii"), 'abc1245') + '\n')
+            problem_str += ("%s\t%s\t%s\t%s\t%s" % ('acct', 'apigateway', 'www576.execute-api.us-east-1.amazonaws.com', '80,443'.encode("ascii"), 'wwwe8932') + '\n')
             self.cls.on_failure(problem_str)
         assert mocks['_event_dict'].mock_calls == [call(self.cls)]
         assert mocks['_send_event'].mock_calls == [

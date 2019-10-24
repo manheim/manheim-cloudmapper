@@ -5,6 +5,7 @@ import json
 
 logger = logging.getLogger(__name__)
 
+
 class PagerDutyV1():
     pd_url = 'https://events.pagerduty.com/generic/2010-04-15/create_event.json'
 
@@ -38,7 +39,7 @@ class PagerDutyV1():
                 'service_key parameter or PD_SERVICE_KEY '
                 'environment variable.'
             )
-        
+
         if incident_key is None:
             incident_key = 'cloudmapper-' + account_name
         self._incident_key = incident_key
@@ -93,8 +94,8 @@ class PagerDutyV1():
     def on_success(self):
         """
         Method called when no thresholds were breached, and run completed
-        successfully. Should resolve any open incidents (if the service supports
-        that functionality) or else simply return.
+        successfully. Should resolve any open incidents (if the service
+        supports that functionality) or else simply return.
         :param duration: duration of the usage/threshold checking run
         :type duration: float
         """
@@ -128,4 +129,3 @@ class PagerDutyV1():
             data['description'] += 'had publicly accesible ports'
             data['details']['hosts_with_ports'] = problem_str
         self._send_event(self._service_key, data)
-     
