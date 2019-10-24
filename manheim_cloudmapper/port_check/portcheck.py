@@ -77,8 +77,12 @@ class PortCheck():
                     bad_ports = self.get_bad_ports(ports)
 
                     if bad_ports:
-                        logger.info("%s\t%s\t%s\t%s\t%s" % (account, aws_type, hostname, bad_ports.encode("ascii"), arn))
-                        problem_str += ("%s\t%s\t%s\t%s\t%s" % (account, aws_type, hostname, bad_ports.encode("ascii"), arn) + '\n')
+                        logger.info("%s\t%s\t%s\t%s\t%s" %
+                                    (account, aws_type, hostname,
+                                        bad_ports.encode("ascii"), arn))
+                        problem_str += ("%s\t%s\t%s\t%s\t%s" %
+                                        (account, aws_type, hostname,
+                                         bad_ports.encode("ascii"), arn) + '\n')
 
         if problem_str == '':
             self.pd.on_success()
