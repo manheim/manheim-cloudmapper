@@ -70,15 +70,11 @@ class PortCheck():
             with open(csv_filename) as csv_file:
                 lines = csv.reader(csv_file, delimiter=',')
                 for line in lines:
-                    print("line: ")
-                    print(line)
                     account = line[0]
                     aws_type = line[1]
                     hostname = line[2]
                     port_list = line[3]
-                    print(port_list)
                     arn = line[4]
-                    print(arn)
 
                     ports = port_list.split(',')
                     bad_ports = self.get_bad_ports(ports)

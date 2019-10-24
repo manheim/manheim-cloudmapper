@@ -59,17 +59,17 @@ class TestGetBadPorts(PortCheckTester):
 class TestCheckBadPorts(PortCheckTester):
 
     def test_check_bad_ports(self):
-        json_data = '{"account": "acct", "type": "test", "hostname": "host.name.aws.com", "ports": ["80","443", "1999"], "arn": "fdsad132"}\n'
-        csv_data = 'account,type,hostname,ports,arn\nacct,test,host.name.aws.com,80,443,1999,fdsad132\n'
+        json_data = ('[{"account": "acct","arn": "abc123","hostname": "abc123.execute-api.us-east-1.amazonaws.com","ports": "80,443,22,1999","type": "apigateway"},'
+                      '{"account": "acct","arn": "abc567","hostname": "abc567.execute-api.us-east-1.amazonaws.com","ports": "80,443,22,1999","type": "apigateway"},'
+                      '{"account": "acct","arn": "abc890","hostname": "abc890.execute-api.us-east-1.amazonaws.com","ports": "80,443,22,1999","type": "apigateway"}]')
+        csv_data = ('acct,apigateway,abc123.execute-api.us-east-1.amazonaws.com,"80,443,22,1999",abc123\n'
+                    'acct,apigateway,abc567.execute-api.us-east-1.amazonaws.com,"80,443,22,1999",abc567\n'
+                    'acct,apigateway,abc890.execute-api.us-east-1.amazonaws.com,"80,443,22,1999",abc890')
 
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-            patch('%s.open' % pbm, mock_open(), create=True) as m_open:
+            patch('%s.open' % pbm, mock_open(read_data=json_data), create=True) as m_open:
 
-            with open('aName.json', 'w') as json:
-                json.write(json_data)
-            with open('aName.csv', 'w') as csv:
-                csv.write(csv_data)
-
+            m_open.side_effect = (m_open.return_value, mock_open(read_data=csv_data).return_value)
             
             self.cls.check_ports()
 
@@ -78,13 +78,14 @@ class TestCheckBadPorts(PortCheckTester):
                 call().__enter__(),
                 call().read(),
                 call('aName.csv'),
-                call().__enter__()
+                call().__exit__(None, None, None)
             ])
 
             mock_logger.assert_has_calls([
-                call.info('{"account": "acct"\t "type": "test"\t "hostname": "host.name.aws.com"\tb\' "ports": [80\'\t443]')
+                call.info("acct\tapigateway\tabc123.execute-api.us-east-1.amazonaws.com\tb'22,1999'\tabc123"),
+                call.info("acct\tapigateway\tabc567.execute-api.us-east-1.amazonaws.com\tb'22,1999'\tabc567"),
+                call.info("acct\tapigateway\tabc890.execute-api.us-east-1.amazonaws.com\tb'22,1999'\tabc890")
             ])
 
-            #os.remove('aName.json')
-            #os.remove('aName.csv')
+            os.remove('aName.csv')
 
