@@ -9,12 +9,14 @@ if (
         sys.version_info[0] < 3 or
         sys.version_info[0] == 3 and sys.version_info[1] < 4
 ):
-    from mock import patch, call, mock_open
+    from mock import patch, call, Mock, mock_open
 else:
-    from unittest.mock import patch, call, mock_open
+    from unittest.mock import patch, call, Mock, mock_open
 
 pbm = 'manheim_cloudmapper.port_check.portcheck'
 pb = '%s.PortCheck' % pbm
+
+pd = 'manheim_cloudmapper.port_check.pagerdutyv1'
 
 
 class TestInit(object):
@@ -63,6 +65,13 @@ class TestGetBadPorts(PortCheckTester):
 class TestCheckBadPorts(PortCheckTester):
 
     def test_check_bad_ports(self):
+        mock_http = Mock()
+        mock_resp = Mock(
+            status=200, data='{"status": "success", "message": '
+                             '"Event processed", "incident_key":'
+                             ' "iKey"}'
+        )
+        mock_http.request.return_value = mock_resp
         json_data = ('[{"account": "acct","arn": "abc123","hostname": '
                      '"abc123.execute-api.us-east-1.amazonaws.com",'
                      '"ports": "80,443,22,1999","type": "apigateway"},'
@@ -83,9 +92,11 @@ class TestCheckBadPorts(PortCheckTester):
                     '"80,443,22,1999",abc890')
 
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
+                patch('%s.urllib3.PoolManager' % pd) as mock_pm, \
                 patch('%s.open' % pbm, mock_open(read_data=json_data),
                       create=True) as m_open:
 
+            mock_pm.return_value = mock_http
             m_open.side_effect = (m_open.return_value,
                                   mock_open(read_data=csv_data).return_value)
 
