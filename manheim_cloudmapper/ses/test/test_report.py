@@ -41,7 +41,8 @@ class TestReport(object):
                 sender='foo@maheim.com', recipient='bar@manheim.com',
                 region='us-east-1',
                 ses_enabled='true')
-        assert cls.report_source == '/opt/cloudmapper/web/account-data/report.html'
+        assert cls.report_source == (
+            '/opt/cloudmapper/web/account-data/report.html')
         assert cls.account_name == 'foo'
         assert cls.sender == 'foo@maheim.com'
         assert cls.recipient == 'bar@manheim.com'
@@ -57,7 +58,8 @@ class TestReport(object):
                 'SES_ENABLED': 'true'
                 }, clear=True):
             cls = Report()
-        assert cls.report_source == '/opt/cloudmapper/web/account-data/report.html'
+        assert cls.report_source == (
+            '/opt/cloudmapper/web/account-data/report.html')
         assert cls.account_name == 'foo'
         assert cls.sender == 'foo@maheim.com'
         assert cls.recipient == 'AWS SES <bar@manheim.com>'
@@ -66,7 +68,8 @@ class TestReport(object):
 
     def test_generate_and_send_email_disabled(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-            patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+            patch('%s.open' % pbm, mock_open(read_data='foo'),
+                  create=True) as m_open, \
             patch('%s.boto3.client' % ses) as mock_boto, \
             patch.dict(os.environ, {
                 'ACCOUNT': 'foo',
@@ -83,7 +86,9 @@ class TestReport(object):
             }
 
             now = datetime.datetime.now()
-            cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
+            cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
+                                    '-' + str(now.month) + '-' + str(now.day) +
+                                    '.html')
             with open(cloudmapper_filename, 'w+') as html:
                 html.write('bar')
 
@@ -91,14 +96,16 @@ class TestReport(object):
             cls.generate_and_send_email()
 
             mock_logger.assert_has_calls([
-                call.info("Skipping Cloudmapper SES Email send because SES is not enabled.")
+                call.info("Skipping Cloudmapper SES Email"
+                          " send because SES is not enabled.")
             ])
             assert m_open.mock_calls == []
             os.remove(cloudmapper_filename)
 
     def test_generate_and_send_email_enabled(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-            patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+            patch('%s.open' % pbm, mock_open(read_data='foo'),
+                  create=True) as m_open, \
             patch('%s.boto3.client' % ses) as mock_boto, \
             patch.dict(os.environ, {
                 'ACCOUNT': 'foo',
@@ -115,7 +122,9 @@ class TestReport(object):
             }
 
             now = datetime.datetime.now()
-            cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
+            cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
+                                    '-' + str(now.month) + '-' + str(now.day) +
+                                    '.html')
             with open(cloudmapper_filename, 'w+') as html:
                 html.write('bar')
 
@@ -140,7 +149,8 @@ class TestReport(object):
                 call('/opt/cloudmapper/' + cloudmapper_filename, 'w+'),
                 call().__enter__(),
                 call().read(),
-                call().write('<html><head></head><body><p>foo</p></body></html>'),
+                call().write('<html><head></head><body><p>foo'
+                             '</p></body></html>'),
                 call().__exit__(None, None, None),
                 call().__exit__(None, None, None),
                 call(cloudmapper_filename, 'r'),
@@ -162,7 +172,8 @@ class TestReport(object):
             os.remove(cloudmapper_filename)
 
     def test_js_replace(self):
-        with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+        with patch('%s.open' % pbm, mock_open(read_data='foo'),
+                   create=True) as m_open, \
             patch('%s.boto3.client' % ses) as mock_boto, \
             patch.dict(os.environ, {
                 'ACCOUNT': 'foo',
@@ -191,7 +202,8 @@ class TestReport(object):
             ]
 
     def test_css_js_fix(self):
-        with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+        with patch('%s.open' % pbm, mock_open(read_data='foo'),
+                   create=True) as m_open, \
             patch('%s.boto3.client' % ses) as mock_boto, \
             patch.dict(os.environ, {
                 'ACCOUNT': 'foo',
@@ -202,7 +214,9 @@ class TestReport(object):
                 }, clear=True):
 
             now = datetime.datetime.now()
-            cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
+            cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
+                                    '-' + str(now.month) + '-' + str(now.day) +
+                                    '.html')
             with open(cloudmapper_filename, 'w+') as html:
                 html.write('bar')
 
@@ -221,7 +235,8 @@ class TestReport(object):
             os.remove(cloudmapper_filename)
 
     def test_premailer_transform(self):
-        with patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+        with patch('%s.open' % pbm, mock_open(read_data='foo'),
+                   create=True) as m_open, \
             patch('%s.boto3.client' % ses) as mock_boto, \
             patch.dict(os.environ, {
                 'ACCOUNT': 'foo',
@@ -232,10 +247,13 @@ class TestReport(object):
                 }, clear=True):
 
             now = datetime.datetime.now()
-            cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
+            cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
+                                    '-' + str(now.month) + '-' + str(now.day) +
+                                    '.html')
 
             cls = Report()
-            cls.premailer_transform('/opt/cloudmapper/web/account-data/report.html')
+            cls.premailer_transform(
+                '/opt/cloudmapper/web/account-data/report.html')
 
             assert m_open.mock_calls == [
                 call('/opt/cloudmapper/web/account-data/report.html', 'r'),
@@ -243,7 +261,8 @@ class TestReport(object):
                 call('/opt/cloudmapper/' + cloudmapper_filename, 'w+'),
                 call().__enter__(),
                 call().read(),
-                call().write('<html><head></head><body><p>foo</p></body></html>'),
+                call().write('<html><head></head><body><p>foo'
+                             '</p></body></html>'),
                 call().__exit__(None, None, None),
                 call().__exit__(None, None, None)
             ]

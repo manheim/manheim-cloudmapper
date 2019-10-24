@@ -12,7 +12,10 @@ class Report():
     # Base path for CSS stylings, default for cloudmapper
     BASE_PATH = '/opt/cloudmapper/web/css'
 
-    def __init__(self, report_source='/opt/cloudmapper/web/account-data/report.html', account_name=None, sender=None, recipient=None, region=None, ses_enabled=None):
+    def __init__(self,
+                 report_source='/opt/cloudmapper/web/account-data/report.html',
+                 account_name=None, sender=None, recipient=None,
+                 region=None, ses_enabled=None):
         """
         Initialize the Cloudmapper report. Sets variables for email.
 
@@ -35,7 +38,8 @@ class Report():
             sender = os.environ.get('SES_SENDER', None)
 
         if recipient is None:
-            recipient = 'AWS SES <' + os.environ.get('SES_RECIPIENT', None) + '>'
+            recipient = ('AWS SES <' +
+                         os.environ.get('SES_RECIPIENT', None) + '>')
 
         if region is None:
             region = os.environ.get('AWS_REGION', None)
@@ -60,10 +64,12 @@ class Report():
         """
 
         if self.ses_enabled != "true":
-            logger.info("Skipping Cloudmapper SES Email send because SES is not enabled.")
+            logger.info("Skipping Cloudmapper SES Email send"
+                        " because SES is not enabled.")
             return
 
-        subject = '[cloudmapper ' + self.account_name + '] Cloudmapper audit findings'
+        subject = ('[cloudmapper ' + self.account_name +
+                   '] Cloudmapper audit findings')
         body_text = "Please see the attached file for cloudmapper results."
 
         # Inject JS file contents into HTML
@@ -80,7 +86,8 @@ class Report():
 
         attachments = [out_file]
         logger.info("Sengind SES Email.")
-        self.ses.send_email(self.sender, self.recipient, subject, body_text, body_html, attachments)
+        self.ses.send_email(self.sender, self.recipient,
+                            subject, body_text, body_html, attachments)
 
     def js_replace(self, source):
         """
@@ -104,8 +111,14 @@ class Report():
         report_js_data = report_js.read()
         report_js.close()
 
-        new_html_data = html_data.replace('<script src="../js/chart.js"></script>', '<script>' + chart_js_data + '</script>')
-        new_html_data = new_html_data.replace('<script src="../js/report.js"></script>', '<script>' + report_js_data + '</script>')
+        chart_needle = '<script src="../js/chart.js"></script>'
+        report_needle = '<script src="../js/report.js"></script>'
+        new_html_data = html_data.replace(chart_needle,
+                                          '<script>' + chart_js_data +
+                                          '</script>')
+        new_html_data = new_html_data.replace(report_needle,
+                                              '<script>' + report_js_data +
+                                              '</script>')
 
         new_html = open(source, 'w')
         new_html.write(new_html_data)
@@ -133,7 +146,8 @@ class Report():
     table, td, th {border:1px solid black; padding: 1px;}
     th {background-color: #ddd; text-align: center;}"""
 
-        new_html_data = html_data.replace('.mytooltip:hover .tooltiptext {visibility:visible}', additional_css)
+        tooltip_needle = '.mytooltip:hover .tooltiptext {visibility:visible}'
+        new_html_data = html_data.replace(tooltip_needle, additional_css)
 
         new_html = open(source, 'w')
         new_html.write(new_html_data)
@@ -149,9 +163,12 @@ class Report():
         """
 
         now = datetime.datetime.now()
-        cloudmapper_filename = 'cloudmapper_report_' + str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '.html'
+        cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
+                                '-' + str(now.month) + '-' + str(now.day) +
+                                '.html')
 
-        with open(source, 'r') as fin, open('/opt/cloudmapper/' + cloudmapper_filename, 'w+') as fout:
+        with open(source, 'r') as fin, \
+                open('/opt/cloudmapper/' + cloudmapper_filename, 'w+') as fout:
             data = fin.read()
             new_content = transform(data, base_path=self.BASE_PATH)
             fout.write(new_content)

@@ -41,7 +41,8 @@ class TestSES(object):
 
     def test_send_email(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-                patch('%s.open' % pbm, mock_open(read_data='foo'), create=True) as m_open, \
+                patch('%s.open' % pbm, mock_open(read_data='foo'),
+                      create=True) as m_open, \
                 patch('%s.boto3.client' % pbm) as mock_boto:
             mock_boto.return_value.get_caller_identity.return_value = {
                 'UserId': 'MyUID',
@@ -59,7 +60,9 @@ class TestSES(object):
 
             mock_boto.assert_has_calls([
                 call('ses', region_name='us-east-1'),
-                call().send_raw_email(Destinations=['bar@manheim.com'], RawMessage={'Data': ANY}, Source='foo@maheim.com')
+                call().send_raw_email(Destinations=['bar@manheim.com'],
+                                      RawMessage={'Data': ANY},
+                                      Source='foo@maheim.com')
             ])
             assert m_open.mock_calls == [
                 call('report.html', 'rb'),

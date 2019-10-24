@@ -31,7 +31,8 @@ class SES():
         # Create a new SES resource
         self.client = boto3.client('ses', region_name=region)
 
-    def send_email(self, sender, recipient, subject, body_text, body_html, attachments):
+    def send_email(self, sender, recipient, subject,
+                   body_text, body_html, attachments):
         """
         Send a raw email using AWS SES
 
@@ -41,7 +42,7 @@ class SES():
         :type recipiend: str
         :param subject: Email subject
         :type subject: str
-        :param body_text: Email Body Text (displayed in clients that do not support html emails)
+        :param body_text: Email Body Text
         :type body_text: str
         :param body_html: HTML comtents of the email
         :type body_html: str
@@ -58,10 +59,14 @@ class SES():
 
         # Create a multipart/alternative child container.
         msg_body = MIMEMultipart('alternative')
-        # Encode the text and HTML content and set the character encoding. This step is
-        # necessary if you're sending a message with characters outside the ASCII range.
-        textpart = MIMEText(body_text.encode(self.CHARSET), 'plain', self.CHARSET)
-        htmlpart = MIMEText(body_html.encode(self.CHARSET), 'html', self.CHARSET)
+        # Encode the text and HTML content and
+        # set the character encoding. This step is
+        # necessary if you're sending a message with
+        # characters outside the ASCII range.
+        textpart = MIMEText(body_text.encode(self.CHARSET),
+                            'plain', self.CHARSET)
+        htmlpart = MIMEText(body_html.encode(self.CHARSET),
+                            'html', self.CHARSET)
 
         # Add the text and HTML parts to the child container.
         msg_body.attach(textpart)
@@ -71,11 +76,14 @@ class SES():
             # Define the attachment part and encode it using MIMEApplication.
             att = MIMEApplication(open(attachment, 'rb').read())
 
-            # Add a header to tell the email client to treat this part as an attachment,
+            # Add a header to tell the email client to
+            # treat this part as an attachment,
             # and to give the attachment a name.
-            att.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment))
+            att.add_header('Content-Disposition', 'attachment',
+                           filename=os.path.basename(attachment))
 
-            # Attach the multipart/alternative child container to the multipart/mixed
+            # Attach the multipart/alternative child container
+            # to the multipart/mixed
             # parent container.
             msg.attach(msg_body)
 
