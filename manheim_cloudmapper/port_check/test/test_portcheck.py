@@ -89,3 +89,30 @@ class TestCheckBadPorts(PortCheckTester):
 
             os.remove('aName.csv')
 
+    def test_check_bad_ports_empty(self):
+        json_data = ('[{"account": "acct","arn": "abc123","hostname": "abc123.execute-api.us-east-1.amazonaws.com","ports": "80,443","type": "apigateway"},'
+                      '{"account": "acct","arn": "abc567","hostname": "abc567.execute-api.us-east-1.amazonaws.com","ports": "80,443","type": "apigateway"},'
+                      '{"account": "acct","arn": "abc890","hostname": "abc890.execute-api.us-east-1.amazonaws.com","ports": "80,443","type": "apigateway"}]')
+        csv_data = ('acct,apigateway,abc123.execute-api.us-east-1.amazonaws.com,"80,443",abc123\n'
+                    'acct,apigateway,abc567.execute-api.us-east-1.amazonaws.com,"80,443",abc567\n'
+                    'acct,apigateway,abc890.execute-api.us-east-1.amazonaws.com,"80,443",abc890')
+
+        with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
+            patch('%s.open' % pbm, mock_open(read_data=json_data), create=True) as m_open:
+
+            m_open.side_effect = (m_open.return_value, mock_open(read_data=csv_data).return_value)
+            
+            self.cls.check_ports()
+
+            m_open.assert_has_calls([
+                call('aName.json', 'r'),
+                call().__enter__(),
+                call().read(),
+                call('aName.csv'),
+                call().__exit__(None, None, None)
+            ])
+
+            mock_logger.assert_has_calls([])
+
+            os.remove('aName.csv')
+
