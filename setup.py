@@ -24,7 +24,6 @@ classifiers = [
     'License :: OSI Approved :: Apache Software License',
     'Natural Language :: English',
     'Operating System :: OS Independent',
-    'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
     'Topic :: System :: Distributed Computing',
     'Topic :: System :: Systems Administration',
