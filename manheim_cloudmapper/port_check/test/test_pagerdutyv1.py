@@ -9,9 +9,9 @@ if (
         sys.version_info[0] < 3 or
         sys.version_info[0] == 3 and sys.version_info[1] < 4
 ):
-    from mock import patch, call, Mock, mock_open, DEFAULT
+    from mock import patch, call, Mock, DEFAULT
 else:
-    from unittest.mock import patch, call, Mock, mock_open, DEFAULT
+    from unittest.mock import patch, call, Mock, DEFAULT
 
 pbm = 'manheim_cloudmapper.port_check.pagerdutyv1'
 pb = '%s.PagerDutyV1' % pbm

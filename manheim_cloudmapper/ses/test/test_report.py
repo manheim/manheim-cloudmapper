@@ -13,8 +13,6 @@
 # limitations under the License.
 
 import sys
-import pytest
-import yaml
 import os
 import datetime
 from manheim_cloudmapper.ses.report import Report
@@ -25,9 +23,9 @@ if (
         sys.version_info[0] < 3 or
         sys.version_info[0] == 3 and sys.version_info[1] < 4
 ):
-    from mock import patch, call, Mock, mock_open
+    from mock import patch, call, mock_open
 else:
-    from unittest.mock import patch, call, Mock, mock_open
+    from unittest.mock import patch, call, mock_open
 
 
 pbm = 'manheim_cloudmapper.ses.report'

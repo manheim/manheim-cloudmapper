@@ -1,6 +1,5 @@
 import sys
 import os
-import pytest
 from manheim_cloudmapper.port_check.portcheck import PortCheck
 from manheim_cloudmapper.port_check.pagerdutyv1 import PagerDutyV1
 
@@ -10,9 +9,9 @@ if (
         sys.version_info[0] < 3 or
         sys.version_info[0] == 3 and sys.version_info[1] < 4
 ):
-    from mock import patch, call, Mock, mock_open, DEFAULT
+    from mock import patch, call, mock_open
 else:
-    from unittest.mock import patch, call, Mock, mock_open, DEFAULT
+    from unittest.mock import patch, call, mock_open
 
 pbm = 'manheim_cloudmapper.port_check.portcheck'
 pb = '%s.PortCheck' % pbm

@@ -13,10 +13,6 @@
 # limitations under the License.
 
 import sys
-import pytest
-import yaml
-import os
-import boto3
 from manheim_cloudmapper.ses.ses import SES
 from botocore.exceptions import ClientError
 
@@ -26,9 +22,9 @@ if (
         sys.version_info[0] < 3 or
         sys.version_info[0] == 3 and sys.version_info[1] < 4
 ):
-    from mock import patch, call, Mock, mock_open, ANY
+    from mock import patch, call, mock_open, ANY
 else:
-    from unittest.mock import patch, call, Mock, mock_open, ANY
+    from unittest.mock import patch, call, mock_open, ANY
 
 pbm = 'manheim_cloudmapper.ses.ses'
 

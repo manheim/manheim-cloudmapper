@@ -1,10 +1,6 @@
 import os
 import datetime
-import premailer
-import re
-import shutil
 import logging
-from tempfile import mkstemp
 from premailer import transform
 from .ses import SES
 

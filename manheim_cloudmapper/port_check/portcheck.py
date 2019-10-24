@@ -1,9 +1,5 @@
-import os
 import json
-import sys
-import subprocess
 import csv
-import pandas
 import logging
 from pandas.io.json import json_normalize
 from .pagerdutyv1 import PagerDutyV1
