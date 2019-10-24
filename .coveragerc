@@ -1,0 +1,14 @@
+[run]
+branch = True
+omit = lib/*
+       manheim_cloudmapper/tests/*
+       setup.py
+       manheim_cloudmapper/vendor/*
+
+[report]
+exclude_lines =
+    # this cant ever be run by py.test, but it just calls one function,
+    # so ignore it
+    if __name__ == .__main__.:
+    if sys.version_info.+
+    .*# nocoverage.*
