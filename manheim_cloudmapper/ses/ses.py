@@ -92,7 +92,7 @@ class SES():
 
         try:
             # Provide the contents of the email.
-            response = self.client.send_raw_email(
+            self.client.send_raw_email(
                 Source=sender,
                 Destinations=[
                     recipient
@@ -106,4 +106,3 @@ class SES():
             logger.error(e.response['Error']['Message'])
         else:
             logger.info("Email sent!")
-            # logger.info("Message ID: " + response['MessageId'])

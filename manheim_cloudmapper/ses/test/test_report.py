@@ -23,67 +23,80 @@ if (
         sys.version_info[0] < 3 or
         sys.version_info[0] == 3 and sys.version_info[1] < 4
 ):
-    from mock import patch, call, mock_open
+    from mock import patch, call, Mock, mock_open
 else:
-    from unittest.mock import patch, call, mock_open
-
+    from unittest.mock import patch, call, Mock, mock_open
 
 pbm = 'manheim_cloudmapper.ses.report'
-ses = 'manheim_cloudmapper.ses.ses'
 
 
-class TestReport(object):
+class TestInit(object):
+    def test_all_options(self):
+        with patch('%s.SES' % pbm) as m_ses:
+            cls = Report(
+                  report_source='/opt/cloudmapper/web/account-data/report.html',
+                  account_name='foo',
+                  sender='foo@maheim.com',
+                  recipient='AWS SES <bar@manheim.com>',
+                  region='us-east-1',
+                  ses_enabled='true')
+            assert cls.report_source == (
+                '/opt/cloudmapper/web/account-data/report.html')
+            assert cls.account_name == 'foo'
+            assert cls.sender == 'foo@maheim.com'
+            assert cls.recipient == 'AWS SES <bar@manheim.com>'
+            assert cls.region == 'us-east-1'
+            assert cls.ses_enabled == 'true'
+            assert m_ses.mock_calls == [
+                call('us-east-1')
+            ]
 
-    def test_init(self):
-        cls = Report(
-                report_source='/opt/cloudmapper/web/account-data/report.html',
-                account_name='foo',
-                sender='foo@maheim.com', recipient='bar@manheim.com',
-                region='us-east-1',
-                ses_enabled='true')
-        assert cls.report_source == (
-            '/opt/cloudmapper/web/account-data/report.html')
-        assert cls.account_name == 'foo'
-        assert cls.sender == 'foo@maheim.com'
-        assert cls.recipient == 'bar@manheim.com'
-        assert cls.region == 'us-east-1'
-        assert cls.ses_enabled == 'true'
-
-    def test_init_with_env(self):
-        with patch.dict(os.environ, {
-                'ACCOUNT': 'foo',
-                'SES_SENDER': 'foo@maheim.com',
-                'SES_RECIPIENT': 'bar@manheim.com',
-                'AWS_REGION': 'us-east-1',
-                'SES_ENABLED': 'true'
-                }, clear=True):
+    @patch.dict(
+        'os.environ',
+        {'ACCOUNT': 'foo',
+         'SES_SENDER': 'foo@maheim.com',
+         'SES_RECIPIENT': 'bar@manheim.com',
+         'AWS_REGION': 'us-east-1',
+         'SES_ENABLED': 'true'}, clear=True)
+    def test_with_env(self):
+        with patch('%s.SES' % pbm) as m_ses:
             cls = Report()
-        assert cls.report_source == (
-            '/opt/cloudmapper/web/account-data/report.html')
-        assert cls.account_name == 'foo'
-        assert cls.sender == 'foo@maheim.com'
-        assert cls.recipient == 'AWS SES <bar@manheim.com>'
-        assert cls.region == 'us-east-1'
-        assert cls.ses_enabled == 'true'
+            assert cls.report_source == (
+                '/opt/cloudmapper/web/account-data/report.html')
+            assert cls.account_name == 'foo'
+            assert cls.sender == 'foo@maheim.com'
+            assert cls.recipient == 'AWS SES <bar@manheim.com>'
+            assert cls.region == 'us-east-1'
+            assert cls.ses_enabled == 'true'
+            assert m_ses.mock_calls == [
+                call('us-east-1')
+            ]
+
+
+class ReportTester(object):
+
+    @patch.dict(
+        'os.environ',
+        {'ACCOUNT': 'foo',
+         'SES_SENDER': 'foo@maheim.com',
+         'SES_RECIPIENT': 'bar@manheim.com',
+         'AWS_REGION': 'us-east-1',
+         'SES_ENABLED': 'true'}, clear=True)
+    def setup(self):
+        self.mock_ses = Mock()
+        with patch('%s.SES' % pbm) as m_ses:
+            m_ses.return_value = self.mock_ses
+            self.cls = Report()
+
+
+class TestGenerateAndSendEmail(ReportTester):
 
     def test_generate_and_send_email_disabled(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
             patch('%s.open' % pbm, mock_open(read_data='foo'),
-                  create=True) as m_open, \
-            patch('%s.boto3.client' % ses) as mock_boto, \
-            patch.dict(os.environ, {
-                'ACCOUNT': 'foo',
-                'SES_SENDER': 'foo@maheim.com',
-                'SES_RECIPIENT': 'bar@manheim.com',
-                'AWS_REGION': 'us-east-1',
-                'SES_ENABLED': 'false'
-                }, clear=True):
+                  create=True) as m_open:
 
-            mock_boto.return_value.get_caller_identity.return_value = {
-                'UserId': 'MyUID',
-                'Arn': 'myARN',
-                'Account': '1234567890'
-            }
+            self.cls.ses_enabled = "false"
 
             now = datetime.datetime.now()
             cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
@@ -92,8 +105,7 @@ class TestReport(object):
             with open(cloudmapper_filename, 'w+') as html:
                 html.write('bar')
 
-            cls = Report()
-            cls.generate_and_send_email()
+            self.cls.generate_and_send_email()
 
             mock_logger.assert_has_calls([
                 call.info("Skipping Cloudmapper SES Email"
@@ -105,21 +117,7 @@ class TestReport(object):
     def test_generate_and_send_email_enabled(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
             patch('%s.open' % pbm, mock_open(read_data='foo'),
-                  create=True) as m_open, \
-            patch('%s.boto3.client' % ses) as mock_boto, \
-            patch.dict(os.environ, {
-                'ACCOUNT': 'foo',
-                'SES_SENDER': 'foo@maheim.com',
-                'SES_RECIPIENT': 'bar@manheim.com',
-                'AWS_REGION': 'us-east-1',
-                'SES_ENABLED': 'true'
-                }, clear=True):
-
-            mock_boto.return_value.get_caller_identity.return_value = {
-                'UserId': 'MyUID',
-                'Arn': 'myARN',
-                'Account': '1234567890'
-            }
+                  create=True) as m_open:
 
             now = datetime.datetime.now()
             cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
@@ -128,8 +126,7 @@ class TestReport(object):
             with open(cloudmapper_filename, 'w+') as html:
                 html.write('bar')
 
-            cls = Report()
-            cls.generate_and_send_email()
+            self.cls.generate_and_send_email()
 
             assert m_open.mock_calls == [
                 call('/opt/cloudmapper/web/account-data/report.html', 'r'),
@@ -166,25 +163,19 @@ class TestReport(object):
             ]
 
             mock_logger.assert_has_calls([
-                call.info("Sengind SES Email.")
+                call.info("Sending SES Email.")
             ])
 
             os.remove(cloudmapper_filename)
 
+
+class TestJsReplace(ReportTester):
+
     def test_js_replace(self):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
-                   create=True) as m_open, \
-            patch('%s.boto3.client' % ses) as mock_boto, \
-            patch.dict(os.environ, {
-                'ACCOUNT': 'foo',
-                'SES_SENDER': 'foo@maheim.com',
-                'SES_RECIPIENT': 'bar@manheim.com',
-                'AWS_REGION': 'us-east-1',
-                'SES_ENABLED': 'true'
-                }, clear=True):
+                   create=True) as m_open:
 
-            cls = Report()
-            cls.js_replace('/opt/cloudmapper/web/account-data/report.html')
+            self.cls.js_replace('/opt/cloudmapper/web/account-data/report.html')
 
             assert m_open.mock_calls == [
                 call('/opt/cloudmapper/web/account-data/report.html', 'r'),
@@ -201,17 +192,12 @@ class TestReport(object):
                 call().close()
             ]
 
+
+class TestCssJsFix(ReportTester):
+
     def test_css_js_fix(self):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
-                   create=True) as m_open, \
-            patch('%s.boto3.client' % ses) as mock_boto, \
-            patch.dict(os.environ, {
-                'ACCOUNT': 'foo',
-                'SES_SENDER': 'foo@maheim.com',
-                'SES_RECIPIENT': 'bar@manheim.com',
-                'AWS_REGION': 'us-east-1',
-                'SES_ENABLED': 'true'
-                }, clear=True):
+                   create=True) as m_open:
 
             now = datetime.datetime.now()
             cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
@@ -220,8 +206,7 @@ class TestReport(object):
             with open(cloudmapper_filename, 'w+') as html:
                 html.write('bar')
 
-            cls = Report()
-            cls.css_js_fix(cloudmapper_filename)
+            self.cls.css_js_fix(cloudmapper_filename)
 
             assert m_open.mock_calls == [
                 call(cloudmapper_filename, 'r'),
@@ -234,25 +219,19 @@ class TestReport(object):
 
             os.remove(cloudmapper_filename)
 
+
+class TestPremailerTransform(ReportTester):
+
     def test_premailer_transform(self):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
-                   create=True) as m_open, \
-            patch('%s.boto3.client' % ses) as mock_boto, \
-            patch.dict(os.environ, {
-                'ACCOUNT': 'foo',
-                'SES_SENDER': 'foo@maheim.com',
-                'SES_RECIPIENT': 'bar@manheim.com',
-                'AWS_REGION': 'us-east-1',
-                'SES_ENABLED': 'true'
-                }, clear=True):
+                   create=True) as m_open:
 
             now = datetime.datetime.now()
             cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
                                     '-' + str(now.month) + '-' + str(now.day) +
                                     '.html')
 
-            cls = Report()
-            cls.premailer_transform(
+            self.cls.premailer_transform(
                 '/opt/cloudmapper/web/account-data/report.html')
 
             assert m_open.mock_calls == [

@@ -85,7 +85,7 @@ class Report():
             body_html = html.read()
 
         attachments = [out_file]
-        logger.info("Sengind SES Email.")
+        logger.info("Sending SES Email.")
         self.ses.send_email(self.sender, self.recipient,
                             subject, body_text, body_html, attachments)
 

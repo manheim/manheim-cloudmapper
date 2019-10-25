@@ -14,7 +14,6 @@
 
 import sys
 from manheim_cloudmapper.ses.ses import SES
-from botocore.exceptions import ClientError
 
 # https://code.google.com/p/mock/issues/detail?id=249
 # py>=3.4 should use unittest.mock not the mock package on pypi
