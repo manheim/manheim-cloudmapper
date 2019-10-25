@@ -77,6 +77,6 @@ class TestSendEmail(SESTester):
                 call('report.html', 'rb'),
                 call().read()
             ]
-            mock_logger.assert_has_calls([
+            assert mock_logger.mock_calls == [
                 call.info('Email sent!')
-            ])
+            ]

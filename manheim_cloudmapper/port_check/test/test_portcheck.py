@@ -73,12 +73,12 @@ class TestCheckBadPorts(PortCheckTester):
 
             self.cls.check_ports()
 
-            m_open.assert_has_calls([
+            assert m_open.mock_calls == [
                 call('aName.json', 'r'),
                 call().__enter__(),
                 call().read(),
                 call().__exit__(None, None, None)
-            ])
+            ]
 
             problem_str = ("acct\tapigateway\t"
                            "abc123.execute-api.us-east-1.amazonaws.com\t"
@@ -109,12 +109,12 @@ class TestCheckBadPorts(PortCheckTester):
 
             self.cls.check_ports()
 
-            m_open.assert_has_calls([
+            assert m_open.mock_calls == [
                 call('aName.json', 'r'),
                 call().__enter__(),
                 call().read(),
                 call().__exit__(None, None, None)
-            ])
+            ]
 
             assert self.mock_pd.mock_calls == [
                 call.on_success()

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import sys
-import os
 import datetime
 from manheim_cloudmapper.ses.report import Report
 
@@ -97,22 +96,14 @@ class TestGenerateAndSendEmail(ReportTester):
                   create=True) as m_open:
 
             self.cls.ses_enabled = "false"
-
-            now = datetime.datetime.now()
-            cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
-                                    '-' + str(now.month) + '-' + str(now.day) +
-                                    '.html')
-            with open(cloudmapper_filename, 'w+') as html:
-                html.write('bar')
-
             self.cls.generate_and_send_email()
 
-            mock_logger.assert_has_calls([
+            assert mock_logger.mock_calls == [
                 call.info("Skipping Cloudmapper SES Email"
                           " send because SES is not enabled.")
-            ])
+            ]
             assert m_open.mock_calls == []
-            os.remove(cloudmapper_filename)
+            assert self.mock_ses.mock_calls == []
 
     def test_generate_and_send_email_enabled(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
@@ -123,8 +114,6 @@ class TestGenerateAndSendEmail(ReportTester):
             cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
                                     '-' + str(now.month) + '-' + str(now.day) +
                                     '.html')
-            with open(cloudmapper_filename, 'w+') as html:
-                html.write('bar')
 
             self.cls.generate_and_send_email()
 
@@ -162,11 +151,17 @@ class TestGenerateAndSendEmail(ReportTester):
                 call().__exit__(None, None, None)
             ]
 
-            mock_logger.assert_has_calls([
-                call.info("Sending SES Email.")
-            ])
+            assert self.mock_ses.mock_calls == [
+                call.send_email('foo@maheim.com', 'AWS SES <bar@manheim.com>',
+                                '[cloudmapper foo] Cloudmapper audit findings',
+                                'Please see the attached file for '
+                                'cloudmapper results.',
+                                'foo', [cloudmapper_filename])
+            ]
 
-            os.remove(cloudmapper_filename)
+            assert mock_logger.mock_calls == [
+                call.info("Sending SES Email.")
+            ]
 
 
 class TestJsReplace(ReportTester):
@@ -203,8 +198,6 @@ class TestCssJsFix(ReportTester):
             cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
                                     '-' + str(now.month) + '-' + str(now.day) +
                                     '.html')
-            with open(cloudmapper_filename, 'w+') as html:
-                html.write('bar')
 
             self.cls.css_js_fix(cloudmapper_filename)
 
@@ -216,8 +209,6 @@ class TestCssJsFix(ReportTester):
                 call().write('foo'),
                 call().close()
             ]
-
-            os.remove(cloudmapper_filename)
 
 
 class TestPremailerTransform(ReportTester):
