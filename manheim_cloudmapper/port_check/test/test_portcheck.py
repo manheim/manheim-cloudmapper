@@ -20,7 +20,6 @@ pd = 'manheim_cloudmapper.port_check.pagerdutyv1'
 pds = '%s.PagerDutyV1' % pd
 
 
-
 class TestInit(object):
 
     @patch.dict(
@@ -67,13 +66,13 @@ class TestGetBadPorts(PortCheckTester):
 class TestCheckBadPorts(PortCheckTester):
 
     def test_check_bad_ports(self):
-        #mock_http = Mock()
-        #mock_resp = Mock(
+        # mock_http = Mock()
+        # mock_resp = Mock(
         #    status=200, data='{"status": "success", "message": '
         #                     '"Event processed", "incident_key":'
         #                     ' "iKey"}'
-        #)
-        #mock_http.request.return_value = mock_resp
+        # )
+        # mock_http.request.return_value = mock_resp
         json_data = ('[{"account": "acct","arn": "abc123","hostname": '
                      '"abc123.execute-api.us-east-1.amazonaws.com",'
                      '"ports": "80,443,22,1999","type": "apigateway"},'
@@ -93,12 +92,14 @@ class TestCheckBadPorts(PortCheckTester):
                     'abc890.execute-api.us-east-1.amazonaws.com,'
                     '"80,443,22,1999",abc890')
 
+        mock_pd = Mock()
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-                patch('%s._send_event' % pds, autospec=True) as m_send, \
+                patch('%s.PagerDutyV1' % pbm, autospec=True) as m_pd, \
                 patch('%s.open' % pbm,
                       mock_open(read_data=json_data), create=True) as m_open:
 
-            #mock_pm.return_value = mock_http
+            # mock_pm.return_value = mock_http
+            m_pd.return_value = mock_pd
             m_open.side_effect = (m_open.return_value,
                                   mock_open(read_data=csv_data).return_value)
 
