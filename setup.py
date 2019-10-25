@@ -42,11 +42,5 @@ setup(
     long_description_content_type='text/markdown',
     install_requires=requires,
     keywords="cloudmapper aws",
-    classifiers=classifiers,
-    entry_points={
-        'console_scripts': [
-            'run-port-check = manheim_cloudmapper.run_port_check:main',
-            'send-email = manheim_cloudmapper.send_email:main'
-        ]
-    }
+    classifiers=classifiers
 )

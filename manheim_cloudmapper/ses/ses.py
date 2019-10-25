@@ -106,4 +106,4 @@ class SES():
             logger.error(e.response['Error']['Message'])
         else:
             logger.info("Email sent!")
-            logger.info("Message ID: " + response['MessageId'])
+            # logger.info("Message ID: " + response['MessageId'])

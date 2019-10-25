@@ -22,16 +22,15 @@ if (
         sys.version_info[0] < 3 or
         sys.version_info[0] == 3 and sys.version_info[1] < 4
 ):
-    from mock import patch, call, mock_open, ANY
+    from mock import patch, call, mock_open, Mock, ANY
 else:
-    from unittest.mock import patch, call, mock_open, ANY
+    from unittest.mock import patch, call, mock_open, Mock, ANY
 
 pbm = 'manheim_cloudmapper.ses.ses'
 
 
-class TestSES(object):
-
-    def test_init(self):
+class TestInit(object):
+    def test_all_options(self):
         with patch('%s.boto3.client' % pbm) as mock_boto:
             cls = SES(region='us-east-1')
             assert cls.region == 'us-east-1'
@@ -39,18 +38,29 @@ class TestSES(object):
                 call('ses', region_name='us-east-1')
             ]
 
-    def test_send_email(self):
-        with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-                patch('%s.open' % pbm, mock_open(read_data='foo'),
-                      create=True) as m_open, \
-                patch('%s.boto3.client' % pbm) as mock_boto:
-            mock_boto.return_value.get_caller_identity.return_value = {
+
+class SESTester(object):
+
+    def setup(self):
+        self.mock_boto = Mock()
+        with patch('%s.boto3.client' % pbm) as m_boto:
+            m_boto.return_value = self.mock_boto
+            m_boto.return_value.get_caller_identity.return_value = {
                 'UserId': 'MyUID',
                 'Arn': 'myARN',
                 'Account': '1234567890'
             }
-            cls = SES(region='us-east-1')
-            cls.send_email(
+            self.cls = SES(region='us-east-1')
+
+
+class TestSendEmail(SESTester):
+
+    def test_send_email(self):
+        with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
+                patch('%s.open' % pbm, mock_open(read_data='foo'),
+                      create=True) as m_open:
+
+            self.cls.send_email(
                     sender='foo@maheim.com',
                     recipient='bar@manheim.com',
                     subject='foo',
@@ -58,12 +68,12 @@ class TestSES(object):
                     body_html='<html></html>',
                     attachments=['report.html'])
 
-            mock_boto.assert_has_calls([
-                call('ses', region_name='us-east-1'),
-                call().send_raw_email(Destinations=['bar@manheim.com'],
-                                      RawMessage={'Data': ANY},
-                                      Source='foo@maheim.com')
-            ])
+            assert self.mock_boto.mock_calls == [
+                call.send_raw_email(Destinations=['bar@manheim.com'],
+                                    RawMessage={'Data': ANY},
+                                    Source='foo@maheim.com')
+            ]
+
             assert m_open.mock_calls == [
                 call('report.html', 'rb'),
                 call().read()

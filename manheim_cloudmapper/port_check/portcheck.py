@@ -1,5 +1,4 @@
 import json
-import csv
 import logging
 from pandas.io.json import json_normalize
 from .pagerdutyv1 import PagerDutyV1
@@ -56,35 +55,27 @@ class PortCheck():
 
         problem_str = ''
 
-        with open(self.filename_in, 'r') as data:
-            csv_filename = self.account_name + '.csv'
+        df = self._read_json()
 
-            json_data = json.load(data)
-            df = json_normalize(json_data)
-            df = df[['account', 'type', 'hostname', 'ports', 'arn']]
-            df.to_csv(csv_filename, header=False, index=False)
+        for row in df.itertuples():
+            bad_ports = self.get_bad_ports(row.ports.split(','))
 
-            with open(csv_filename) as csv_file:
-                lines = csv.reader(csv_file, delimiter=',')
-                for line in lines:
-                    account = line[0]
-                    aws_type = line[1]
-                    hostname = line[2]
-                    port_list = line[3]
-                    arn = line[4]
-
-                    ports = port_list.split(',')
-                    bad_ports = self.get_bad_ports(ports)
-
-                    if bad_ports:
-                        logger.info("%s\t%s\t%s\t%s\t%s" %
-                                    (account, aws_type, hostname,
-                                        bad_ports.encode("ascii"), arn))
-                        problem_str += ("%s\t%s\t%s\t%s\t%s" %
-                                        (account, aws_type, hostname,
-                                         bad_ports.encode("ascii"), arn) + '\n')
+            if bad_ports:
+                logger.info("%s\t%s\t%s\t%s\t%s" %
+                            (row.account, row.type, row.hostname,
+                                bad_ports.encode("ascii"), row.arn))
+                problem_str += ("%s\t%s\t%s\t%s\t%s" %
+                                (row.account, row.type, row.hostname,
+                                 bad_ports.encode("ascii"), row.arn) + '\n')
 
         if problem_str == '':
             self.pd.on_success()
         else:
             self.pd.on_failure(problem_str)
+
+    def _read_json(self):
+        with open(self.filename_in, 'r') as data:
+            json_data = json.load(data)
+            df = json_normalize(json_data)
+            df = df[['account', 'type', 'hostname', 'ports', 'arn']]
+        return df
