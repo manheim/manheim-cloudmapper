@@ -21,4 +21,5 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-docker run -it --rm "$1" --version
+docker run -it --rm "$1" \
+  bash -c "/opt/cloudmapper/cloudmapper.sh --version"
