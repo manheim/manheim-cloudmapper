@@ -34,9 +34,6 @@ jobs:
       env: TOXENV=py37
     - stage: test
       python: '3.7'
-      env: TOXENV=docs
-    - stage: test
-      python: '3.7'
       env: TOXENV=docker
     - stage: deploy
       python: '3.7'
