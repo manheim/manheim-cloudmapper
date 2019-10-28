@@ -30,4 +30,4 @@ Main Components
 Installation and Usage
 ----------------------
 
-This repository should only be used together with the appropriate Terraform module hosted [here](https://ghe.coxautoinc.com/MAN-TerraformModules/fargate-cloudmapper). The terraform code is where all paramters will be set for the Cloudmapper run.
+This repository should only be used together with the appropriate Terraform module. The terraform code is where all paramters will be set for the Cloudmapper run.
