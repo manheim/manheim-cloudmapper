@@ -13,7 +13,9 @@ class Report():
     BASE_PATH = '/opt/manheim_cloudmapper/web/css'
 
     def __init__(self,
-                 report_source='/opt/manheim_cloudmapper/web/account-data/report.html',
+                 report_source=(
+                     '/opt/manheim_cloudmapper/web/account-data/report.html'
+                 ),
                  account_name=None, sender=None, recipient=None,
                  region=None, ses_enabled=None):
         """
@@ -168,7 +170,8 @@ class Report():
                                 '.html')
 
         with open(source, 'r') as fin, \
-                open('/opt/manheim_cloudmapper/' + cloudmapper_filename, 'w+') as fout:
+                open('/opt/manheim_cloudmapper/' +
+                     cloudmapper_filename, 'w+') as fout:
             data = fin.read()
             new_content = transform(data, base_path=self.BASE_PATH)
             fout.write(new_content)
