@@ -2,21 +2,21 @@ FROM python:3.7-slim as cloudmapper
 
 ARG git_version
 
-WORKDIR /opt/cloudmapper
+WORKDIR /opt/manheim_cloudmapper
 
 RUN apt-get update -y
 RUN apt-get -y install build-essential git autoconf automake libtool python3.7-dev python3-tk jq awscli python3-pip
 RUN apt-get install -y bash
 
-RUN git clone --branch 2.7.2 https://github.com/duo-labs/cloudmapper.git /opt/cloudmapper
+RUN git clone --branch 2.7.2 https://github.com/duo-labs/cloudmapper.git /opt/manheim_cloudmapper
 
-RUN mkdir /opt/cloudmapper/port_check
-COPY manheim_cloudmapper/* /opt/cloudmapper/
+RUN mkdir /opt/manheim_cloudmapper/port_check
+COPY manheim_cloudmapper/* /opt/manheim_cloudmapper/
 
-COPY manheim_cloudmapper/port_check/ /opt/cloudmapper/port_check/
-COPY manheim_cloudmapper/ses/ /opt/cloudmapper/ses/
+COPY manheim_cloudmapper/port_check/ /opt/manheim_cloudmapper/port_check/
+COPY manheim_cloudmapper/ses/ /opt/manheim_cloudmapper/ses/
 
-RUN chmod +x /opt/cloudmapper/cloudmapper.sh
+RUN chmod +x /opt/manheim_cloudmapper/cloudmapper.sh
 
 RUN pip install pipenv
 RUN pipenv install premailer --skip-lock

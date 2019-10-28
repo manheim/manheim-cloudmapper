@@ -33,14 +33,14 @@ class TestInit(object):
     def test_all_options(self):
         with patch('%s.SES' % pbm) as m_ses:
             cls = Report(
-                  report_source='/opt/cloudmapper/web/account-data/report.html',
+                  report_source='/opt/manheim_cloudmapper/web/account-data/report.html',
                   account_name='foo',
                   sender='foo@maheim.com',
                   recipient='AWS SES <bar@manheim.com>',
                   region='us-east-1',
                   ses_enabled='true')
             assert cls.report_source == (
-                '/opt/cloudmapper/web/account-data/report.html')
+                '/opt/manheim_cloudmapper/web/account-data/report.html')
             assert cls.account_name == 'foo'
             assert cls.sender == 'foo@maheim.com'
             assert cls.recipient == 'AWS SES <bar@manheim.com>'
@@ -61,7 +61,7 @@ class TestInit(object):
         with patch('%s.SES' % pbm) as m_ses:
             cls = Report()
             assert cls.report_source == (
-                '/opt/cloudmapper/web/account-data/report.html')
+                '/opt/manheim_cloudmapper/web/account-data/report.html')
             assert cls.account_name == 'foo'
             assert cls.sender == 'foo@maheim.com'
             assert cls.recipient == 'AWS SES <bar@manheim.com>'
@@ -118,21 +118,21 @@ class TestGenerateAndSendEmail(ReportTester):
             self.cls.generate_and_send_email()
 
             assert m_open.mock_calls == [
-                call('/opt/cloudmapper/web/account-data/report.html', 'r'),
+                call('/opt/manheim_cloudmapper/web/account-data/report.html', 'r'),
                 call().read(),
                 call().close(),
-                call('/opt/cloudmapper/web/js/chart.js', 'r'),
+                call('/opt/manheim_cloudmapper/web/js/chart.js', 'r'),
                 call().read(),
                 call().close(),
-                call('/opt/cloudmapper/web/js/report.js', 'r'),
+                call('/opt/manheim_cloudmapper/web/js/report.js', 'r'),
                 call().read(),
                 call().close(),
-                call('/opt/cloudmapper/web/account-data/report.html', 'w'),
+                call('/opt/manheim_cloudmapper/web/account-data/report.html', 'w'),
                 call().write('foo'),
                 call().close(),
-                call('/opt/cloudmapper/web/account-data/report.html', 'r'),
+                call('/opt/manheim_cloudmapper/web/account-data/report.html', 'r'),
                 call().__enter__(),
-                call('/opt/cloudmapper/' + cloudmapper_filename, 'w+'),
+                call('/opt/manheim_cloudmapper/' + cloudmapper_filename, 'w+'),
                 call().__enter__(),
                 call().read(),
                 call().write('<html><head></head><body><p>foo'
@@ -170,19 +170,19 @@ class TestJsReplace(ReportTester):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
                    create=True) as m_open:
 
-            self.cls.js_replace('/opt/cloudmapper/web/account-data/report.html')
+            self.cls.js_replace('/opt/manheim_cloudmapper/web/account-data/report.html')
 
             assert m_open.mock_calls == [
-                call('/opt/cloudmapper/web/account-data/report.html', 'r'),
+                call('/opt/manheim_cloudmapper/web/account-data/report.html', 'r'),
                 call().read(),
                 call().close(),
-                call('/opt/cloudmapper/web/js/chart.js', 'r'),
+                call('/opt/manheim_cloudmapper/web/js/chart.js', 'r'),
                 call().read(),
                 call().close(),
-                call('/opt/cloudmapper/web/js/report.js', 'r'),
+                call('/opt/manheim_cloudmapper/web/js/report.js', 'r'),
                 call().read(),
                 call().close(),
-                call('/opt/cloudmapper/web/account-data/report.html', 'w'),
+                call('/opt/manheim_cloudmapper/web/account-data/report.html', 'w'),
                 call().write('foo'),
                 call().close()
             ]
@@ -223,12 +223,12 @@ class TestPremailerTransform(ReportTester):
                                     '.html')
 
             self.cls.premailer_transform(
-                '/opt/cloudmapper/web/account-data/report.html')
+                '/opt/manheim_cloudmapper/web/account-data/report.html')
 
             assert m_open.mock_calls == [
-                call('/opt/cloudmapper/web/account-data/report.html', 'r'),
+                call('/opt/manheim_cloudmapper/web/account-data/report.html', 'r'),
                 call().__enter__(),
-                call('/opt/cloudmapper/' + cloudmapper_filename, 'w+'),
+                call('/opt/manheim_cloudmapper/' + cloudmapper_filename, 'w+'),
                 call().__enter__(),
                 call().read(),
                 call().write('<html><head></head><body><p>foo'

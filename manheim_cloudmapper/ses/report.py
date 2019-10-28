@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 class Report():
 
     # Base path for CSS stylings, default for cloudmapper
-    BASE_PATH = '/opt/cloudmapper/web/css'
+    BASE_PATH = '/opt/manheim_cloudmapper/web/css'
 
     def __init__(self,
-                 report_source='/opt/cloudmapper/web/account-data/report.html',
+                 report_source='/opt/manheim_cloudmapper/web/account-data/report.html',
                  account_name=None, sender=None, recipient=None,
                  region=None, ses_enabled=None):
         """
@@ -103,11 +103,11 @@ class Report():
         html_data = html.read()
         html.close()
 
-        chart_js = open('/opt/cloudmapper/web/js/chart.js', 'r')
+        chart_js = open('/opt/manheim_cloudmapper/web/js/chart.js', 'r')
         chart_js_data = chart_js.read()
         chart_js.close()
 
-        report_js = open('/opt/cloudmapper/web/js/report.js', 'r')
+        report_js = open('/opt/manheim_cloudmapper/web/js/report.js', 'r')
         report_js_data = report_js.read()
         report_js.close()
 
@@ -168,7 +168,7 @@ class Report():
                                 '.html')
 
         with open(source, 'r') as fin, \
-                open('/opt/cloudmapper/' + cloudmapper_filename, 'w+') as fout:
+                open('/opt/manheim_cloudmapper/' + cloudmapper_filename, 'w+') as fout:
             data = fin.read()
             new_content = transform(data, base_path=self.BASE_PATH)
             fout.write(new_content)
