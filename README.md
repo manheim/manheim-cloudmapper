@@ -22,18 +22,19 @@ For documentation on the upstream cloudmapper project, please see <https://githu
 Introduction and Goals
 ----------------------
 
-Cloudmapper is ...
-
-
-.. _index.main_components:
+Cloudmapper is a tool designed to help analyze AWS environments. Cloudmapper contains a `public` command which is used to find public hosts and port ranges. (More details [here](https://summitroute.com/blog/2018/06/13/cloudmapper_public/).). The purpose of this repository is to run Cloudmapper remotely (on AWS) and use the `public` command to find any AWS resources which have publicly accessible ports. Alerts will then be generated and sent to PagerDuty.
 
 Main Components
 ---------------
 
-The following commands are available in the Docker container (or Python installation):
+**PagerDuty Alert:** A PagerDuty alert will be generated when a public port is found that is not listed in the `OK_PORTS` environment varbiable. This varaible is set via the Terraform module specifications. (See Installation and Usage section)
+
+**AWS SES Email:** An SES (simple email service) email is generated and sent to AWS account owners with the cloudmapper audit findings. These findings contain the public port information as well as AWS account specific information (resource counts,  audit findings, etc.). This feature is disabled by default and requires AWS SES setup to function properly. 
 
 
 Installation and Usage
 ----------------------
+
+This repository should only be used together with the appropriate Terraform module hosted [here](https://ghe.coxautoinc.com/MAN-TerraformModules/fargate-cloudmapper). The terraform code is where all paramters will be set for the Cloudmapper run.
 
 See [Installation and Usage](https://manheim-cloudmapper.readthedocs.io/en/latest/usage/)
