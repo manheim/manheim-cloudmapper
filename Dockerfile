@@ -8,7 +8,7 @@ RUN apt-get update -y
 RUN apt-get -y install build-essential git autoconf automake libtool python3.7-dev python3-tk jq awscli python3-pip
 RUN apt-get install -y bash
 
-RUN git clone https://github.com/duo-labs/cloudmapper.git /opt/cloudmapper
+RUN git clone --branch 2.7.2 https://github.com/duo-labs/cloudmapper.git /opt/cloudmapper
 
 RUN mkdir /opt/cloudmapper/port_check
 COPY manheim_cloudmapper/* /opt/cloudmapper/

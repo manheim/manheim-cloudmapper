@@ -22,4 +22,4 @@ if [ -z "$1" ]; then
 fi
 
 docker run -it --rm "$1" \
-  bash -c "/opt/cloudmapper/cloudmapper.sh --version"
+  bash -c "pipenv run python --version"
