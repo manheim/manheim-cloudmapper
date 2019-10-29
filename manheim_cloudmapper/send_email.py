@@ -1,5 +1,5 @@
 import os
-from ses.ses_report_sender import SesReportSender
+from .ses.ses_report_sender import SesReportSender
 
 
 def send_email():
@@ -9,6 +9,7 @@ def send_email():
 
 def bool_convert(s):
     return s == "true"
+
 
 if __name__ == "__main__":
     send_email()
