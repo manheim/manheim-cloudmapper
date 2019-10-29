@@ -40,7 +40,8 @@ class PortCheck():
         for port in ports:
             if port not in self.ok_ports:
                 bad_ports.append(port)
-        return ",".join(bad_ports)
+
+        return bad_ports
 
     def check_ports(self):
         """
@@ -58,7 +59,8 @@ class PortCheck():
         df = self._read_json()
 
         for row in df.itertuples():
-            bad_ports = self.get_bad_ports(row.ports.split(','))
+            bad_ports_list = self.get_bad_ports(row.ports.split(','))
+            bad_ports = ",".join(bad_ports_list)
 
             if bad_ports:
                 logger.info("%s\t%s\t%s\t%s\t%s" %

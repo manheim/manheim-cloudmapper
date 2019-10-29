@@ -30,30 +30,35 @@ class Report():
         :param region: AWS Region
         :type region: str
         :param ses_enabled: wheter the SES email functionality is enabled
-        :type ses_enabled: str
+        :type ses_enabled: bool
         """
+        
+        if ses_enabled is None:
+            ses_enabled = self.bool_convert(os.environ['SES_ENABLED'])
+
+        if not ses_enabled:
+            logger.info("Skipping Cloudmapper SES Email send"
+                        " because SES is not enabled.")
+            return
+
         self.report_source = report_source
         if account_name is None:
-            account_name = os.environ.get('ACCOUNT', None)
+            account_name = os.environ['ACCOUNT']
 
         if sender is None:
-            sender = os.environ.get('SES_SENDER', None)
+            sender = os.environ['SES_SENDER']
 
         if recipient is None:
             recipient = ('AWS SES <' +
-                         os.environ.get('SES_RECIPIENT', None) + '>')
+                         os.environ['SES_RECIPIENT'] + '>')
 
         if region is None:
-            region = os.environ.get('AWS_REGION', None)
-
-        if ses_enabled is None:
-            ses_enabled = os.environ.get('SES_ENABLED', None)
+            region = os.environ['AWS_REGION']
 
         self.account_name = account_name
         self.sender = sender
         self.recipient = recipient
         self.region = region
-        self.ses_enabled = ses_enabled
 
         self.ses = SES(self.region)
 
@@ -65,14 +70,9 @@ class Report():
         to support CSS and JS functionality
         """
 
-        if self.ses_enabled != "true":
-            logger.info("Skipping Cloudmapper SES Email send"
-                        " because SES is not enabled.")
-            return
-
-        subject = ('[cloudmapper ' + self.account_name +
-                   '] Cloudmapper audit findings')
-        body_text = "Please see the attached file for cloudmapper results."
+        subject = (f'[cloudmapper {self.account_name}]'
+                   ' Cloudmapper audit findings')
+        body_text = 'Please see the attached file for cloudmapper results.'
 
         # Inject JS file contents into HTML
         self.js_replace(self.report_source)
@@ -177,3 +177,6 @@ class Report():
             fout.write(new_content)
 
         return cloudmapper_filename
+    
+    def bool_convert(self, s):
+        return s == "true"

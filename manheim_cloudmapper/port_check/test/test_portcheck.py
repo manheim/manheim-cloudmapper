@@ -1,15 +1,6 @@
 import sys
 from manheim_cloudmapper.port_check.portcheck import PortCheck
-
-# https://code.google.com/p/mock/issues/detail?id=249
-# py>=3.4 should use unittest.mock not the mock package on pypi
-if (
-        sys.version_info[0] < 3 or
-        sys.version_info[0] == 3 and sys.version_info[1] < 4
-):
-    from mock import patch, call, Mock, mock_open
-else:
-    from unittest.mock import patch, call, Mock, mock_open
+from unittest.mock import patch, call, Mock, mock_open
 
 pbm = 'manheim_cloudmapper.port_check.portcheck'
 pb = '%s.PortCheck' % pbm
@@ -23,8 +14,8 @@ class TestInit(object):
         clear=True
     )
     def test_all_options(self):
-        cls = PortCheck(ok_ports='80,443', account_name='aName')
-        assert cls.ok_ports == '80,443'
+        cls = PortCheck(ok_ports=['80', '443'], account_name='aName')
+        assert cls.ok_ports == ['80', '443']
         assert cls.account_name == 'aName'
         assert cls.filename_in == 'aName.json'
 
@@ -40,18 +31,18 @@ class PortCheckTester(object):
         self.mock_pd = Mock()
         with patch('%s.PagerDutyV1' % pbm) as m_pd:
             m_pd.return_value = self.mock_pd
-            self.cls = PortCheck('80,443', 'aName')
+            self.cls = PortCheck(['80', '443'], 'aName')
 
 
 class TestGetBadPorts(PortCheckTester):
 
     def test_get_bad_ports(self):
         bad_ports = self.cls.get_bad_ports(
-            '80,443,1999,22,80,432,12435,443'.split(','))
-        assert bad_ports == '1999,22,432,12435'
+            ['80', '443', '1999', '22', '80', '432', '12435', '443'])
+        assert bad_ports == ['1999', '22', '432', '12435']
 
     def test_get_bad_ports_empty(self):
-        bad_ports = self.cls.get_bad_ports('80,443'.split(','))
+        bad_ports = self.cls.get_bad_ports(['80', '443'])
         assert bad_ports == ''
 
 

@@ -15,32 +15,8 @@ requires = [
     'premailer'
 ]
 
-classifiers = [
-    'Development Status :: 5 - Production/Stable',
-    'Environment :: Console',
-    'Intended Audience :: Developers',
-    'Intended Audience :: Information Technology',
-    'Intended Audience :: System Administrators',
-    'License :: OSI Approved :: Apache Software License',
-    'Natural Language :: English',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python :: 3',
-    'Topic :: System :: Distributed Computing',
-    'Topic :: System :: Systems Administration',
-    'Topic :: Utilities'
-]
-
 setup(
     name='manheim-cloudmapper',
     version=VERSION,
-    author='Manheim Release Engineering',
-    author_email='man-releaseengineering@manheim.com',
-    packages=find_packages(),
-    url=PROJECT_URL,
-    description='cloudmapper policy generation script and related utilities',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    install_requires=requires,
-    keywords="cloudmapper aws",
-    classifiers=classifiers
+    packages=find_packages()
 )

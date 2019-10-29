@@ -1,6 +1,7 @@
 FROM python:3.7-slim as cloudmapper
 
 ARG git_version
+ARG cloudmapper_version
 
 WORKDIR /opt/manheim_cloudmapper
 
@@ -25,7 +26,7 @@ RUN pipenv install --skip-lock
 RUN bash
 
 LABEL com.manheim.commit=$git_version \
-      org.opencontainers.image.revision=$git_version \
+      org.opencontainers.image.revision=$cloudmapper_version \
       com.manheim.repo="https://github.com/manheim/manheim-cloudmapper.git" \
       org.opencontainers.image.source="https://github.com/manheim/manheim-cloudmapper.git" \
       org.opencontainers.image.url="https://github.com/manheim/manheim-cloudmapper" \
