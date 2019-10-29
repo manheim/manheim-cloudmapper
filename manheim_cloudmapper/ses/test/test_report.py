@@ -151,8 +151,7 @@ class TestJsReplace(ReportTester):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
                    create=True) as m_open:
 
-            self.cls.js_replace(
-                '/opt/manheim_cloudmapper/web/account-data/report.html')
+            self.cls.js_replace()
 
             assert m_open.mock_calls == [
                 call(
@@ -210,8 +209,7 @@ class TestPremailerTransform(ReportTester):
                                     '-' + str(now.month) + '-' + str(now.day) +
                                     '.html')
 
-            self.cls.premailer_transform(
-                '/opt/manheim_cloudmapper/web/account-data/report.html')
+            self.cls.premailer_transform()
 
             assert m_open.mock_calls == [
                 call(

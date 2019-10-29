@@ -65,10 +65,10 @@ class Report():
         body_text = 'Please see the attached file for cloudmapper results.'
 
         # Inject JS file contents into HTML
-        self.js_replace(self.report_source)
+        self.js_replace()
 
         # Run premailer transformation to inject CSS data directly in HTML
-        out_file = self.premailer_transform(self.report_source)
+        out_file = self.premailer_transform()
 
         # Fix CSS post-premailer
         self.css_js_fix(out_file)
@@ -81,7 +81,7 @@ class Report():
         self.ses.send_email(self.sender, self.recipient,
                             subject, body_text, body_html, attachments)
 
-    def js_replace(self, source):
+    def js_replace(self):
         """
         Replaces js source file tags with js file contents.
         This allows the html to contain all data needed for the report
@@ -91,7 +91,7 @@ class Report():
         :type source: str
         """
 
-        html = open(source, 'r')
+        html = open(self.report_source, 'r')
         html_data = html.read()
         html.close()
 
@@ -112,7 +112,7 @@ class Report():
                                               '<script>' + report_js_data +
                                               '</script>')
 
-        new_html = open(source, 'w')
+        new_html = open(self.report_source, 'w')
         new_html.write(new_html_data)
         new_html.close()
 
@@ -145,7 +145,7 @@ class Report():
         new_html.write(new_html_data)
         new_html.close()
 
-    def premailer_transform(self, source):
+    def premailer_transform(self):
         """
         Runs premailer transformation on an html source file.
         A new HTML file with CSS injections is created
@@ -159,7 +159,7 @@ class Report():
                                 '-' + str(now.month) + '-' + str(now.day) +
                                 '.html')
 
-        with open(source, 'r') as fin, \
+        with open(self.report_source, 'r') as fin, \
                 open('/opt/manheim_cloudmapper/' +
                      cloudmapper_filename, 'w+') as fout:
             data = fin.read()

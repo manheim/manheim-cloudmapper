@@ -23,7 +23,7 @@ RUN pip install pipenv
 RUN pipenv install premailer --skip-lock
 RUN pipenv install --skip-lock
 
-RUN bash
+ENTRYPOINT /opt/manheim_cloudmapper/cloudmapper.sh
 
 LABEL com.manheim.commit=$git_version \
       org.opencontainers.image.revision=$cloudmapper_version \
