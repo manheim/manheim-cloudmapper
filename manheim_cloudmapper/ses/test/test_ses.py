@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from manheim_cloudmapper.ses.ses import SES
+from manheim_cloudmapper.ses.ses import SES, ClientError
 from unittest.mock import patch, call, mock_open, Mock, ANY
 
 pbm = 'manheim_cloudmapper.ses.ses'
@@ -69,4 +69,36 @@ class TestSendEmail(SESTester):
             ]
             assert mock_logger.mock_calls == [
                 call.info('Email sent!')
+            ]
+
+    def test_send_email_fails(self):
+        with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
+                patch('%s.open' % pbm, mock_open(read_data='foo'),
+                      create=True) as m_open:
+            error_response = {'Error':
+                              {'Code': '306',
+                               'Message': 'Error with Email Address'}}
+            self.mock_boto.send_raw_email = Mock(
+                side_effect=ClientError(error_response, 'send_raw_email'))
+
+            self.cls.send_email(
+                    sender='foo@maheim',
+                    recipient='bar@manheim.com',
+                    subject='foo',
+                    body_text='body',
+                    body_html='<html></html>',
+                    attachments=['report.html'])
+
+            assert self.mock_boto.mock_calls == [
+                call.send_raw_email(Destinations=['bar@manheim.com'],
+                                    RawMessage={'Data': ANY},
+                                    Source='foo@maheim')
+            ]
+
+            assert m_open.mock_calls == [
+                call('report.html', 'rb'),
+                call().read()
+            ]
+            assert mock_logger.mock_calls == [
+                call.error('Error with Email Address')
             ]
