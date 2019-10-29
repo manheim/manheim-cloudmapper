@@ -21,5 +21,5 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-docker run -it --rm --entrypoint=/bin/bash "$1" \
-  bash -c "pipenv run python --version"
+docker run -it --rm --entrypoint "/usr/local/bin/python" \
+  "$1" --version

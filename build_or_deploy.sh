@@ -47,7 +47,7 @@ function dockertoxbuild {
     echo "Building Docker image..."
     docker build \
       --build-arg git_version="$(git rev-parse --short HEAD)" \
-      --build-arg cloudmapper_version=$version
+      --build-arg cloudmapper_version=$version \
       --no-cache \
       -t "manheim/manheim-cloudmapper:${tag}" .
     echo "Built image and tagged as: manheim/manheim-cloudmapper:${tag}"
