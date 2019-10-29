@@ -236,3 +236,41 @@ class TestOnFailures(PagerDutyV1Tester):
         assert mocks['_send_event'].mock_calls == [
             call(self.cls, 'cKey', expected)
         ]
+
+    def test_failure_no_account_name(self):
+        self.cls._service_key = 'cKey'
+        data = {'event': 'data', 'details': {}}
+        expected = {
+            'event': 'data',
+            'details': {
+                'hosts_with_ports': 'acct\tapigateway\t'
+                                    'abc123.execute-api.us-east-1.aws.com\t'
+                                    'b\'80,443\'\tabc1245\n'
+                                    'acct\tapigateway\t'
+                                    'www576.execute-api.us-east-1.aws.com\t'
+                                    'b\'80,443\'\twwwe8932\n'
+            },
+            'event_type': 'trigger',
+            'description': 'cloudmapper in '
+                           'had publicly accesible ports'
+        }
+        with patch.multiple(
+            pb,
+            autospec=True,
+            _event_dict=DEFAULT,
+            _send_event=DEFAULT
+        ) as mocks:
+            mocks['_event_dict'].return_value = data
+            problem_str = ("%s\t%s\t%s\t%s\t%s" %
+                           ('acct', 'apigateway',
+                            'abc123.execute-api.us-east-1.aws.com',
+                            '80,443'.encode("ascii"), 'abc1245') + '\n')
+            problem_str += ("%s\t%s\t%s\t%s\t%s" %
+                            ('acct', 'apigateway',
+                             'www576.execute-api.us-east-1.aws.com',
+                             '80,443'.encode("ascii"), 'wwwe8932') + '\n')
+            self.cls.on_failure(problem_str)
+        assert mocks['_event_dict'].mock_calls == [call(self.cls)]
+        assert mocks['_send_event'].mock_calls == [
+            call(self.cls, 'cKey', expected)
+        ]
