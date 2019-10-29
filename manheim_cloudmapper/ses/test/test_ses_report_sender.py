@@ -16,7 +16,7 @@ import datetime
 from manheim_cloudmapper.ses.ses_report_sender import SesReportSender
 from unittest.mock import patch, call, Mock, mock_open
 
-pbm = 'manheim_cloudmapper.ses.report'
+pbm = 'manheim_cloudmapper.ses.ses_report_sender'
 
 
 class TestInit(object):
