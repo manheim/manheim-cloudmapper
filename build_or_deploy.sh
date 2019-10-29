@@ -17,7 +17,7 @@ set -x
 set -e
 
 if [ -z "$1" ]; then
-    >&2 echo "USAGE: build_or_deploy.sh [build|dockerbuild|push|dockerbuildtest]"
+    >&2 echo "USAGE: build_or_deploy.sh [dockerbuildtest]"
     exit 1
 fi
 
@@ -59,26 +59,9 @@ function dockerbuildtest {
     ./dockertest.sh "manheim/manheim-cloudmapper:${tag}"
 }
 
-function pythonbuild {
-    rm -Rf dist
-    python setup.py sdist bdist_wheel
-    ls -l dist
-}
-
-function pythonpush {
-    pip install twine
-    twine upload dist/*
-}
-
-if [[ "$1" == "build" ]]; then
-    pythonbuild
-elif [[ "$1" == "dockerbuild" ]]; then
-    dockertoxbuild
-elif [[ "$1" == "push" ]]; then
-    pythonpush
-elif [[ "$1" == "dockerbuildtest" ]]; then
+if [[ "$1" == "dockerbuildtest" ]]; then
     dockerbuildtest
 else
-    >&2 echo "USAGE: do_docker.sh [build|dockerbuild|push|dockerbuildtest]"
+    >&2 echo "USAGE: do_docker.sh [dockerbuildtest]"
     exit 1
 fi
