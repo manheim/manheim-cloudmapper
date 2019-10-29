@@ -1,10 +1,10 @@
 import os
-from ses.report import Report
+from ses.ses_report_sender import SesReportSender
 
 
 def send_email():
     if bool_convert(os.environ['SES_ENABLED']):
-        Report().generate_and_send_email()
+        SesReportSender().generate_and_send_email()
 
 
 def bool_convert(s):

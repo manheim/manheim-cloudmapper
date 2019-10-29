@@ -7,7 +7,7 @@ from .ses import SES
 logger = logging.getLogger(__name__)
 
 
-class Report():
+class SesReportSender():
 
     # Base path for CSS stylings, default for cloudmapper
     BASE_PATH = '/opt/manheim_cloudmapper/web/css'

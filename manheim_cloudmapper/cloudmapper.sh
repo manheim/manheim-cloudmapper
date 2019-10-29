@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# set -e
+set -e
 
 echo "Runnning Cloudmapper.sh"
 
@@ -12,7 +12,7 @@ echo "config.json: "
 cat config.json
 
 echo "Running cloudmapper.py collect on $ACCOUNT"
-pipenv run python cloudmapper.py collect --account $ACCOUNT
+pipenv run python cloudmapper.py collect --account $ACCOUNT || true
 
 echo "Running cloudmapper.py report on $ACCOUNT"
 pipenv run python cloudmapper.py report --account $ACCOUNT

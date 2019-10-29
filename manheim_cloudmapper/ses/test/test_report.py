@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import datetime
-from manheim_cloudmapper.ses.report import Report
+from manheim_cloudmapper.ses.ses_report_sender import SesReportSender
 from unittest.mock import patch, call, Mock, mock_open
 
 pbm = 'manheim_cloudmapper.ses.report'
@@ -22,7 +22,7 @@ pbm = 'manheim_cloudmapper.ses.report'
 class TestInit(object):
     def test_all_options(self):
         with patch('%s.SES' % pbm) as m_ses:
-            cls = Report(
+            cls = SesReportSender(
                   report_source=(
                       '/opt/manheim_cloudmapper/web/account-data/report.html'
                   ),
@@ -48,7 +48,7 @@ class TestInit(object):
          'AWS_REGION': 'us-east-1'}, clear=True)
     def test_with_env(self):
         with patch('%s.SES' % pbm) as m_ses:
-            cls = Report()
+            cls = SesReportSender()
             assert cls.report_source == (
                 '/opt/manheim_cloudmapper/web/account-data/report.html')
             assert cls.account_name == 'foo'
@@ -60,7 +60,7 @@ class TestInit(object):
             ]
 
 
-class ReportTester(object):
+class SesReportTester(object):
 
     @patch.dict(
         'os.environ',
@@ -72,10 +72,10 @@ class ReportTester(object):
         self.mock_ses = Mock()
         with patch('%s.SES' % pbm) as m_ses:
             m_ses.return_value = self.mock_ses
-            self.cls = Report()
+            self.cls = SesReportSender()
 
 
-class TestGenerateAndSendEmail(ReportTester):
+class TestGenerateAndSendEmail(SesReportTester):
 
     def test_generate_and_send_email_enabled(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
@@ -145,7 +145,7 @@ class TestGenerateAndSendEmail(ReportTester):
             ]
 
 
-class TestJsReplace(ReportTester):
+class TestJsReplace(SesReportTester):
 
     def test_js_replace(self):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
@@ -175,7 +175,7 @@ class TestJsReplace(ReportTester):
             ]
 
 
-class TestCssJsFix(ReportTester):
+class TestCssJsFix(SesReportTester):
 
     def test_css_js_fix(self):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
@@ -198,7 +198,7 @@ class TestCssJsFix(ReportTester):
             ]
 
 
-class TestPremailerTransform(ReportTester):
+class TestPremailerTransform(SesReportTester):
 
     def test_premailer_transform(self):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
