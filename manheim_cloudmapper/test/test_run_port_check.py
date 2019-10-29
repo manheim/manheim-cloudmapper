@@ -18,6 +18,7 @@ from unittest.mock import patch, call
 
 pbm = 'manheim_cloudmapper.run_port_check'
 
+
 class TestRunPortCheck(object):
 
     @patch.dict(
