@@ -17,7 +17,7 @@ class Report():
                      '/opt/manheim_cloudmapper/web/account-data/report.html'
                  ),
                  account_name=None, sender=None, recipient=None,
-                 region=None, ses_enabled=None):
+                 region=None):
         """
         Initialize the Cloudmapper report. Sets variables for email.
 
@@ -29,17 +29,7 @@ class Report():
         :type recipient: str
         :param region: AWS Region
         :type region: str
-        :param ses_enabled: wheter the SES email functionality is enabled
-        :type ses_enabled: bool
         """
-        
-        if ses_enabled is None:
-            ses_enabled = self.bool_convert(os.environ['SES_ENABLED'])
-
-        if not ses_enabled:
-            logger.info("Skipping Cloudmapper SES Email send"
-                        " because SES is not enabled.")
-            return
 
         self.report_source = report_source
         if account_name is None:
@@ -177,6 +167,3 @@ class Report():
             fout.write(new_content)
 
         return cloudmapper_filename
-    
-    def bool_convert(self, s):
-        return s == "true"

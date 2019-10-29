@@ -18,5 +18,6 @@ requires = [
 setup(
     name='manheim-cloudmapper',
     version=VERSION,
-    packages=find_packages()
+    packages=find_packages(),
+    install_requires=requires
 )

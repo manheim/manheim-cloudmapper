@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import datetime
 from manheim_cloudmapper.ses.report import Report
 from unittest.mock import patch, call, Mock, mock_open
@@ -30,15 +29,13 @@ class TestInit(object):
                   account_name='foo',
                   sender='foo@maheim.com',
                   recipient='AWS SES <bar@manheim.com>',
-                  region='us-east-1',
-                  ses_enabled='true')
+                  region='us-east-1')
             assert cls.report_source == (
                 '/opt/manheim_cloudmapper/web/account-data/report.html')
             assert cls.account_name == 'foo'
             assert cls.sender == 'foo@maheim.com'
             assert cls.recipient == 'AWS SES <bar@manheim.com>'
             assert cls.region == 'us-east-1'
-            assert cls.ses_enabled == 'true'
             assert m_ses.mock_calls == [
                 call('us-east-1')
             ]
@@ -48,8 +45,7 @@ class TestInit(object):
         {'ACCOUNT': 'foo',
          'SES_SENDER': 'foo@maheim.com',
          'SES_RECIPIENT': 'bar@manheim.com',
-         'AWS_REGION': 'us-east-1',
-         'SES_ENABLED': 'true'}, clear=True)
+         'AWS_REGION': 'us-east-1'}, clear=True)
     def test_with_env(self):
         with patch('%s.SES' % pbm) as m_ses:
             cls = Report()
@@ -59,7 +55,6 @@ class TestInit(object):
             assert cls.sender == 'foo@maheim.com'
             assert cls.recipient == 'AWS SES <bar@manheim.com>'
             assert cls.region == 'us-east-1'
-            assert cls.ses_enabled == 'true'
             assert m_ses.mock_calls == [
                 call('us-east-1')
             ]
@@ -72,8 +67,7 @@ class ReportTester(object):
         {'ACCOUNT': 'foo',
          'SES_SENDER': 'foo@maheim.com',
          'SES_RECIPIENT': 'bar@manheim.com',
-         'AWS_REGION': 'us-east-1',
-         'SES_ENABLED': 'true'}, clear=True)
+         'AWS_REGION': 'us-east-1'}, clear=True)
     def setup(self):
         self.mock_ses = Mock()
         with patch('%s.SES' % pbm) as m_ses:
@@ -82,21 +76,6 @@ class ReportTester(object):
 
 
 class TestGenerateAndSendEmail(ReportTester):
-
-    def test_generate_and_send_email_disabled(self):
-        with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-            patch('%s.open' % pbm, mock_open(read_data='foo'),
-                  create=True) as m_open:
-
-            self.cls.ses_enabled = "false"
-            self.cls.generate_and_send_email()
-
-            assert mock_logger.mock_calls == [
-                call.info("Skipping Cloudmapper SES Email"
-                          " send because SES is not enabled.")
-            ]
-            assert m_open.mock_calls == []
-            assert self.mock_ses.mock_calls == []
 
     def test_generate_and_send_email_enabled(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
