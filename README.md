@@ -32,9 +32,20 @@ Installation and Usage
 
 **WARNING:** This project is NOT a Python package, this is a Docker image which contains cloudmapper code from [duo-labs](https://github.com/duo-labs/cloudmapper) as well as custom python code to support PagerDuty Alerting and AWS SES notifications.
 
-To use the docker image, execute a `docker run` command  on the `manheim/manheim-cloudmapper` image. 
+To use the docker image, execute a `docker run` command  on the `manheim/manheim-cloudmapper` image. Environment varaibles are required for the docker container to execute. The recommended way to set the environment variables is with the `--env-file` flag.
+```
+docker run --env-file <env_file> manheim/manheim-cloudmapper:<tag>
+```
 
-In order for the docker image to run `cloudmapper.sh` properly, the following environment variables must be set. The recommended way to set the environment variables is with the `--env-file` flag.
+env-file example:
+```
+S3_BUCKET=aws-account-us-east-1-cloudmapper
+ACCOUNT=aws-account
+DATADOG_API_KEY=abc123456
+...
+```
+
+**Environment Varaibles**
 
 | Name            | Description                                                                                                                                     | Example          |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
@@ -49,7 +60,7 @@ In order for the docker image to run `cloudmapper.sh` properly, the following en
 | SES_RECIPIENT   | Email address of SES recipient                                                                                                                  | bar@foo.com      |
 
 **AWS Authentication:**  
-In addition to the environment variables above, the Docker container requires access to the AWS account in which cloudmapper will be run. This means the following AWS Environment varaibles must also be set:
+In addition to the environment variables above, the Docker container requires access to the AWS account in which cloudmapper will be run. This means the following AWS Environment varaibles must also be set in the env-file:
 ```
 AWS_SESSION_TOKEN
 AWS_DEFAULT_REGION
