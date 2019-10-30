@@ -82,51 +82,23 @@ class TestGenerateAndSendEmail(SesReportTester):
             patch('%s.open' % pbm, mock_open(read_data='foo'),
                   create=True) as m_open:
 
-            now = datetime.datetime.now()
-            cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
-                                    '-' + str(now.month) + '-' + str(now.day) +
-                                    '.html')
+            cloudmapper_filename = datetime.datetime.now().strftime(
+                'cloudmapper_report_%Y-%m-%d.html'
+            )
 
             self.cls.generate_and_send_email()
 
             assert m_open.mock_calls == [
-                call(
-                    '/opt/manheim_cloudmapper/web/account-data/report.html',
-                    'r'
-                ),
+                call('/opt/manheim_cloudmapper/web/account-data/report.html',
+                     'r'),
+                call().__enter__(),
                 call().read(),
-                call().close(),
+                call().__exit__(None, None, None),
                 call('/opt/manheim_cloudmapper/web/js/chart.js', 'r'),
+                call().__enter__(),
                 call().read(),
-                call().close(),
+                call().__exit__(None, None, None),
                 call('/opt/manheim_cloudmapper/web/js/report.js', 'r'),
-                call().read(),
-                call().close(),
-                call(
-                    '/opt/manheim_cloudmapper/web/account-data/report.html',
-                    'w'
-                ),
-                call().write('foo'),
-                call().close(),
-                call(
-                    '/opt/manheim_cloudmapper/web/account-data/report.html',
-                    'r'
-                ),
-                call().__enter__(),
-                call('/opt/manheim_cloudmapper/' + cloudmapper_filename, 'w+'),
-                call().__enter__(),
-                call().read(),
-                call().write('<html><head></head><body><p>foo'
-                             '</p></body></html>'),
-                call().__exit__(None, None, None),
-                call().__exit__(None, None, None),
-                call(cloudmapper_filename, 'r'),
-                call().read(),
-                call().close(),
-                call(cloudmapper_filename, 'w'),
-                call().write('foo'),
-                call().close(),
-                call(cloudmapper_filename, 'r'),
                 call().__enter__(),
                 call().read(),
                 call().__exit__(None, None, None)
@@ -137,7 +109,11 @@ class TestGenerateAndSendEmail(SesReportTester):
                                 '[cloudmapper foo] Cloudmapper audit findings',
                                 'Please see the attached file for '
                                 'cloudmapper results.',
-                                'foo', [cloudmapper_filename])
+                                '<html><head></head><body><p>foo'
+                                '</p></body></html>',
+                                {cloudmapper_filename:
+                                 '<html><head></head><body><p>foo'
+                                 '</p></body></html>'})
             ]
 
             assert mock_logger.mock_calls == [
@@ -151,27 +127,20 @@ class TestJsReplace(SesReportTester):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
                    create=True) as m_open:
 
-            self.cls.js_replace()
+            new_data = self.cls.js_replace(
+                '<script src="../js/chart.js"></script>'
+                '<script src="../js/report.js"></script>')
 
+            assert new_data == '<script>foo</script><script>foo</script>'
             assert m_open.mock_calls == [
-                call(
-                    '/opt/manheim_cloudmapper/web/account-data/report.html',
-                    'r'
-                ),
-                call().read(),
-                call().close(),
                 call('/opt/manheim_cloudmapper/web/js/chart.js', 'r'),
+                call().__enter__(),
                 call().read(),
-                call().close(),
+                call().__exit__(None, None, None),
                 call('/opt/manheim_cloudmapper/web/js/report.js', 'r'),
+                call().__enter__(),
                 call().read(),
-                call().close(),
-                call(
-                    '/opt/manheim_cloudmapper/web/account-data/report.html',
-                    'w'
-                ),
-                call().write('foo'),
-                call().close()
+                call().__exit__(None, None, None)
             ]
 
 
@@ -181,47 +150,19 @@ class TestCssJsFix(SesReportTester):
         with patch('%s.open' % pbm, mock_open(read_data='foo'),
                    create=True) as m_open:
 
-            now = datetime.datetime.now()
-            cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
-                                    '-' + str(now.month) + '-' + str(now.day) +
-                                    '.html')
+            additional_css = """
+.mytooltip:hover .tooltiptext {visibility:visible}
+#chartjs-tooltip td {background-color: #fff}
+#chartjs-tooltip table {box-shadow: 5px 10px 8px #888888}
+table {border-collapse:collapse;}
+table, td, th {border:1px solid black; padding: 1px;}
+th {background-color: #ddd; text-align: center;}"""
 
-            self.cls.css_js_fix(cloudmapper_filename)
+            new_data = self.cls.css_js_fix(
+                '.mytooltip:hover .tooltiptext {visibility:visible}'
+            )
 
-            assert m_open.mock_calls == [
-                call(cloudmapper_filename, 'r'),
-                call().read(),
-                call().close(),
-                call(cloudmapper_filename, 'w'),
-                call().write('foo'),
-                call().close()
-            ]
-
-
-class TestPremailerTransform(SesReportTester):
-
-    def test_premailer_transform(self):
-        with patch('%s.open' % pbm, mock_open(read_data='foo'),
-                   create=True) as m_open:
-
-            now = datetime.datetime.now()
-            cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
-                                    '-' + str(now.month) + '-' + str(now.day) +
-                                    '.html')
-
-            self.cls.premailer_transform()
+            assert new_data == additional_css
 
             assert m_open.mock_calls == [
-                call(
-                    '/opt/manheim_cloudmapper/web/account-data/report.html',
-                    'r'
-                ),
-                call().__enter__(),
-                call('/opt/manheim_cloudmapper/' + cloudmapper_filename, 'w+'),
-                call().__enter__(),
-                call().read(),
-                call().write('<html><head></head><body><p>foo'
-                             '</p></body></html>'),
-                call().__exit__(None, None, None),
-                call().__exit__(None, None, None)
             ]

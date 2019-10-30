@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from manheim_cloudmapper.ses.ses import SES, ClientError
-from unittest.mock import patch, call, mock_open, Mock, ANY
+from unittest.mock import patch, call, Mock, ANY
 
 pbm = 'manheim_cloudmapper.ses.ses'
 
@@ -45,9 +45,7 @@ class SESTester(object):
 class TestSendEmail(SESTester):
 
     def test_send_email(self):
-        with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-                patch('%s.open' % pbm, mock_open(read_data='foo'),
-                      create=True) as m_open:
+        with patch('%s.logger' % pbm, autospec=True) as mock_logger:
 
             self.cls.send_email(
                     sender='foo@maheim.com',
@@ -55,7 +53,7 @@ class TestSendEmail(SESTester):
                     subject='foo',
                     body_text='body',
                     body_html='<html></html>',
-                    attachments=['report.html'])
+                    attachments={'report.html': '<html></html>'})
 
             assert self.mock_boto.mock_calls == [
                 call.send_raw_email(Destinations=['bar@manheim.com'],
@@ -63,18 +61,12 @@ class TestSendEmail(SESTester):
                                     Source='foo@maheim.com')
             ]
 
-            assert m_open.mock_calls == [
-                call('report.html', 'rb'),
-                call().read()
-            ]
             assert mock_logger.mock_calls == [
                 call.info('Email sent!')
             ]
 
     def test_send_email_fails(self):
-        with patch('%s.logger' % pbm, autospec=True) as mock_logger, \
-                patch('%s.open' % pbm, mock_open(read_data='foo'),
-                      create=True) as m_open:
+        with patch('%s.logger' % pbm, autospec=True) as mock_logger:
             error_response = {'Error':
                               {'Code': '306',
                                'Message': 'Error with Email Address'}}
@@ -87,7 +79,7 @@ class TestSendEmail(SESTester):
                     subject='foo',
                     body_text='body',
                     body_html='<html></html>',
-                    attachments=['report.html'])
+                    attachments={'report.html': '<html></html>'})
 
             assert self.mock_boto.mock_calls == [
                 call.send_raw_email(Destinations=['bar@manheim.com'],
@@ -95,10 +87,6 @@ class TestSendEmail(SESTester):
                                     Source='foo@maheim')
             ]
 
-            assert m_open.mock_calls == [
-                call('report.html', 'rb'),
-                call().read()
-            ]
             assert mock_logger.mock_calls == [
                 call.error('Error with Email Address')
             ]

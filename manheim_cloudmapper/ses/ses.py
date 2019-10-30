@@ -1,4 +1,3 @@
-import os
 import boto3
 import logging
 from botocore.exceptions import ClientError
@@ -72,15 +71,15 @@ class SES():
         msg_body.attach(textpart)
         msg_body.attach(htmlpart)
 
-        for attachment in attachments:
+        for filename, attachment in attachments.items():
             # Define the attachment part and encode it using MIMEApplication.
-            att = MIMEApplication(open(attachment, 'rb').read())
+            att = MIMEApplication(attachment.encode('utf-8'))
 
             # Add a header to tell the email client to
             # treat this part as an attachment,
             # and to give the attachment a name.
             att.add_header('Content-Disposition', 'attachment',
-                           filename=os.path.basename(attachment))
+                           filename=filename)
 
             # Attach the multipart/alternative child container
             # to the multipart/mixed

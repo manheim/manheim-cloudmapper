@@ -64,24 +64,28 @@ class SesReportSender():
                    ' Cloudmapper audit findings')
         body_text = 'Please see the attached file for cloudmapper results.'
 
+        with open(self.report_source, 'r') as f_in:
+            html_data = f_in.read()
+
         # Inject JS file contents into HTML
-        self.js_replace()
+        html_data = self.js_replace(html_data)
 
         # Run premailer transformation to inject CSS data directly in HTML
-        out_file = self.premailer_transform()
+        html_data = transform(html_data, base_path=self.BASE_PATH)
 
         # Fix CSS post-premailer
-        self.css_js_fix(out_file)
+        html_data = self.css_js_fix(html_data)
 
-        with open(out_file, 'r') as html:
-            body_html = html.read()
+        cloudmapper_filename = datetime.datetime.now().strftime(
+            'cloudmapper_report_%Y-%m-%d.html'
+        )
 
-        attachments = [out_file]
+        attachments = {cloudmapper_filename: html_data}
         logger.info("Sending SES Email.")
         self.ses.send_email(self.sender, self.recipient,
-                            subject, body_text, body_html, attachments)
+                            subject, body_text, html_data, attachments)
 
-    def js_replace(self):
+    def js_replace(self, html_data):
         """
         Replaces js source file tags with js file contents.
         This allows the html to contain all data needed for the report
@@ -91,17 +95,12 @@ class SesReportSender():
         :type source: str
         """
 
-        html = open(self.report_source, 'r')
-        html_data = html.read()
-        html.close()
+        with open('/opt/manheim_cloudmapper/web/js/chart.js', 'r') as chart_js:
+            chart_js_data = chart_js.read()
 
-        chart_js = open('/opt/manheim_cloudmapper/web/js/chart.js', 'r')
-        chart_js_data = chart_js.read()
-        chart_js.close()
-
-        report_js = open('/opt/manheim_cloudmapper/web/js/report.js', 'r')
-        report_js_data = report_js.read()
-        report_js.close()
+        with open('/opt/manheim_cloudmapper/web/js/report.js',
+                  'r') as report_js:
+            report_js_data = report_js.read()
 
         chart_needle = '<script src="../js/chart.js"></script>'
         report_needle = '<script src="../js/report.js"></script>'
@@ -112,11 +111,9 @@ class SesReportSender():
                                               '<script>' + report_js_data +
                                               '</script>')
 
-        new_html = open(self.report_source, 'w')
-        new_html.write(new_html_data)
-        new_html.close()
+        return new_html_data
 
-    def css_js_fix(self, source):
+    def css_js_fix(self, html_data):
         """
         Adds additional CSS to support formatting of JS tables
         Premailer has a hard time evaluating the CSS on JS componenets
@@ -126,44 +123,15 @@ class SesReportSender():
         :type source: str
         """
 
-        html = open(source, 'r')
-        html_data = html.read()
-        html.close()
-
         additional_css = """
-    .mytooltip:hover .tooltiptext {visibility:visible}
-    #chartjs-tooltip td {background-color: #fff}
-    #chartjs-tooltip table {box-shadow: 5px 10px 8px #888888}
-    table {border-collapse:collapse;}
-    table, td, th {border:1px solid black; padding: 1px;}
-    th {background-color: #ddd; text-align: center;}"""
+.mytooltip:hover .tooltiptext {visibility:visible}
+#chartjs-tooltip td {background-color: #fff}
+#chartjs-tooltip table {box-shadow: 5px 10px 8px #888888}
+table {border-collapse:collapse;}
+table, td, th {border:1px solid black; padding: 1px;}
+th {background-color: #ddd; text-align: center;}"""
 
         tooltip_needle = '.mytooltip:hover .tooltiptext {visibility:visible}'
         new_html_data = html_data.replace(tooltip_needle, additional_css)
 
-        new_html = open(source, 'w')
-        new_html.write(new_html_data)
-        new_html.close()
-
-    def premailer_transform(self):
-        """
-        Runs premailer transformation on an html source file.
-        A new HTML file with CSS injections is created
-
-        :param source: Filepath to report.html
-        :type source: str
-        """
-
-        now = datetime.datetime.now()
-        cloudmapper_filename = ('cloudmapper_report_' + str(now.year) +
-                                '-' + str(now.month) + '-' + str(now.day) +
-                                '.html')
-
-        with open(self.report_source, 'r') as fin, \
-                open('/opt/manheim_cloudmapper/' +
-                     cloudmapper_filename, 'w+') as fout:
-            data = fin.read()
-            new_content = transform(data, base_path=self.BASE_PATH)
-            fout.write(new_content)
-
-        return cloudmapper_filename
+        return new_html_data
