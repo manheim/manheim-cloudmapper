@@ -31,3 +31,32 @@ Installation and Usage
 ----------------------
 
 **WARNING:** This project is NOT a Python package, this is a Docker image which contains cloudmapper code from [duo-labs](https://github.com/duo-labs/cloudmapper) as well as custom python code to support PagerDuty Alerting and AWS SES notifications.
+
+To use the docker image, execute a `docker run` command  on the `manheim/manheim-cloudmapper` image. 
+
+In order for the docker image to run `cloudmapper.sh` properly, the following environment variables must be set. The recommended way to set the environment variables is with the `--env-file` flag.
+
+| Name            | Description                                                                                                                                     | Example          |
+|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
+| S3_BUCKET       | AWS S3 bucket name where config.json file for cloudmapper is expected. This json file contains AWS account information for the cloudmapper run. | mybucket         |
+| ACCOUNT         | Name of AWS account where Cloudmapper will be running                                                                                           | aws-company-prod |
+| DATADOG_API_KEY | Datadog API key, for sending metrics                                                                                                            | abc123...        |
+| PD_SERVICE_KEY  | PagerDuty Service Key (Events V1 integration) for alerting on critical thresholds crossed                                                       | xyz890...        |
+| OK_PORTS        | A list of acceptable publicly accesible ports in string format                                                                                  | 80,443           |
+| AWS_REGION      | AWS Region from which SES will send emails                                                                                                      | us-east-1        |
+| SES_ENABLED     | string to enable/disable email notification via SES.                                                                                            | true             |
+| SES_SENDER      | Email address of SES sender                                                                                                                     | foo@bar.com      |
+| SES_RECIPIENT   | Email address of SES recipient                                                                                                                  | bar@foo.com      |
+
+**AWS Authentication:**  
+In addition to the environment variables above, the Docker container requires access to the AWS account in which cloudmapper will be run. This means the following AWS Environment varaibles must also be set:
+```
+AWS_SESSION_TOKEN
+AWS_DEFAULT_REGION
+AWS_SECRET_ACCESS_KEY
+AWS_ACCESS_KEY_ID
+```
+
+The following privilieges are required for the IAM user running cloudmapper:  
+`arn:aws:iam::aws:policy/SecurityAudit`  
+`arn:aws:iam::aws:policy/job-function/ViewOnlyAccess`
