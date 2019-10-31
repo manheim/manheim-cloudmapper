@@ -1,0 +1,50 @@
+__pycache__/
+
+# Distribution / packaging
+.Python
+bin/
+include/
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+src/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Sphinx documentation
+docs/build/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+
+# virtualenv
+bin/
+include/
+
+.idea/
+.pytest_cache
+testresults.xml
+testresults.html
+assets/
+docs/source/.doctrees
+mailer.yml
+.direnv/
+.envrc
+.vscode/
