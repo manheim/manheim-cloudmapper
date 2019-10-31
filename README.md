@@ -60,7 +60,9 @@ DATADOG_API_KEY=abc123456
 | SES_RECIPIENT   | Email address of SES recipient                                                                                                                  | bar@foo.com      |
 
 **AWS Authentication:**  
-In addition to the environment variables above, the Docker container requires access to the AWS account in which cloudmapper will be run. This means the following AWS Environment varaibles must also be set in the env-file:
+In addition to the environment variables above, the Docker container requires access to the AWS account in which cloudmapper will be run. Any method of boto3 AWS [authentication](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#credentials) is supported (environment varaibles, ~/.aws/credentials, ~/.aws/config, etc.)
+
+When using environment varaibles, the following AWS Environment varaibles can be set in the env-file:
 ```
 AWS_SESSION_TOKEN
 AWS_DEFAULT_REGION
