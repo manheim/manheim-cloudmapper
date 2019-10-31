@@ -1,5 +1,5 @@
 import os
-from .port_check.portcheck import PortCheck
+from manheim_cloudmapper.port_check.portcheck import PortCheck
 
 
 def check_bad_ports():

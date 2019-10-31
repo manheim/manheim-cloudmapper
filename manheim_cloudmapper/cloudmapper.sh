@@ -21,10 +21,12 @@ echo "Running cloudmapper.py public scan on $ACCOUNT"
 pipenv run python cloudmapper.py public --account $ACCOUNT > $ACCOUNT.json
 
 echo "Running check on bad ports for $ACCOUNT"
-pipenv run python /opt/manheim_cloudmapper/run_port_check.py
+mv /opt/manheim_cloudmapper/run_port_check.py /opt/run_port_check.py
+pipenv run python /opt/run_port_check.py
 
 echo "Sending email via SES for $ACCOUNT"
-pipenv run python /opt/manheim_cloudmapper/send_email.py
+mv /opt/manheim_cloudmapper/send_email.py /opt/send_email.py
+pipenv run python /opt/send_email.py
 
 echo "Cloudmapper run was successful!"
 

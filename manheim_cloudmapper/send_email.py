@@ -1,5 +1,5 @@
 import os
-from .ses.ses_report_sender import SesReportSender
+from manheim_cloudmapper.ses.ses_report_sender import SesReportSender
 
 
 def send_email():

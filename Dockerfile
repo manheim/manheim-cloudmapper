@@ -6,7 +6,7 @@ ARG cloudmapper_version
 WORKDIR /opt/manheim_cloudmapper
 
 RUN apt-get update -y
-RUN apt-get -y install build-essential git autoconf automake libtool python3.7-dev python3-tk jq awscli python3-pip
+RUN apt-get -y install build-essential git autoconf automake libtool python3.7-dev python3-tk jq awscli python3-pip curl
 RUN apt-get install -y bash
 
 RUN git clone --branch 2.7.2 https://github.com/duo-labs/cloudmapper.git /opt/manheim_cloudmapper
