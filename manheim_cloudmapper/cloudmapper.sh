@@ -33,7 +33,7 @@ echo "Cloudmapper run was successful!"
 # Send success to datadog for monitoring
 curl  -X POST -H "Content-type: application/json" \
 -d "{
-        \"title\": \"Cloudmapper Success\",
+        \"title\": \"Cloudmapper Success for $ACCOUNT\",
         \"text\": \"Cloudmapper run was successful for $ACCOUNT\",
         \"priority\": \"normal\",
         \"alert_type\": \"success\"
