@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.1.1 (2019-11-05)
+0.1.1 (2019-11-06)
 ------------------
 
 * Add account name to datadog event for fixing query results
