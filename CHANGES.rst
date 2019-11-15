@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.4 (2019-11-15)
+------------------
+
+* Build docker image from 2.7.4 manheim/cloudmapper fork.
+
 0.1.3 (2019-11-15)
 ------------------
 
