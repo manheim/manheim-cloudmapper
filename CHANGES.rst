@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.1.3 (2019-11-15)
+------------------
+
+* Build docker image from manheim/cloudmapper fork. This adds support for boto retries.
+* Revert patch command from version 0.1.2
+
 0.1.2 (2019-11-08)
 ------------------
 
