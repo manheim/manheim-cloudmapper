@@ -17,9 +17,6 @@ COPY manheim_cloudmapper/* /opt/manheim_cloudmapper/
 COPY manheim_cloudmapper/port_check/ /opt/manheim_cloudmapper/port_check/
 COPY manheim_cloudmapper/ses/ /opt/manheim_cloudmapper/ses/
 
-# Patch to fix this issue https://github.com/duo-labs/cloudmapper/issues/540
-RUN patch /opt/manheim_cloudmapper/shared/nodes.py < nodes.patch
-
 RUN chmod +x /opt/manheim_cloudmapper/cloudmapper.sh
 
 RUN pip install pipenv
