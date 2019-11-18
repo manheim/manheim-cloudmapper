@@ -1,6 +1,13 @@
 Changelog
 =========
 
+
+0.1.5 (2019-11-18)
+------------------
+
+* Add back in patch command to fix issue https://github.com/duo-labs/cloudmapper/issues/540
+* The issue is that publicly accessible RDS instances have .DBSubnetGroup.Subnets set to null.
+
 0.1.4 (2019-11-15)
 ------------------
 
