@@ -14,8 +14,10 @@ cat config.json
 echo "Running cloudmapper.py collect on $ACCOUNT"
 pipenv run python cloudmapper.py collect --account $ACCOUNT || true
 
-echo "Running cloudmapper.py report on $ACCOUNT"
-pipenv run python cloudmapper.py report --account $ACCOUNT
+if [ $SES_ENABLED == 'true' ]; then
+    echo "Running cloudmapper.py report on $ACCOUNT"
+    pipenv run python cloudmapper.py report --account $ACCOUNT
+fi
 
 echo "Running cloudmapper.py public scan on $ACCOUNT"
 pipenv run python cloudmapper.py public --account $ACCOUNT > $ACCOUNT.json

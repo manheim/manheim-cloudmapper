@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.6 (2019-11-21)
+------------------
+
+* Skip cloudmapper report step when SES is not enabled
+
 
 0.1.5 (2019-11-18)
 ------------------
