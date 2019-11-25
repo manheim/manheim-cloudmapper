@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.1.7 (2019-11-25)
+------------------
+
+* Skip cloudmapper collect step when SES is not enabled.
+* Only run public port check unless otherwise specified.
+* Enable DEBUG output for cloudmapper public runs
+
 0.1.6 (2019-11-21)
 ------------------
 

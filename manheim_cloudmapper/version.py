@@ -17,7 +17,7 @@ manheim-cloudmapper version configuration.
 """
 
 #: The semver-compliant version of the package.
-VERSION = '0.1.6'
+VERSION = '0.1.7'
 
 #: The URL for further information about the package.
 PROJECT_URL = 'https://github.com/manheim/manheim-cloudmapper'
