@@ -11,16 +11,16 @@ echo "S3 Copy successful!"
 echo "config.json: "
 cat config.json
 
-echo "Running cloudmapper.py collect on $ACCOUNT"
-pipenv run python cloudmapper.py collect --account $ACCOUNT || true
-
 if [ $SES_ENABLED == 'true' ]; then
+    echo "Running cloudmapper.py collect on $ACCOUNT"
+    pipenv run python cloudmapper.py collect --account $ACCOUNT || true
+
     echo "Running cloudmapper.py report on $ACCOUNT"
     pipenv run python cloudmapper.py report --account $ACCOUNT
 fi
 
 echo "Running cloudmapper.py public scan on $ACCOUNT"
-pipenv run python cloudmapper.py public --account $ACCOUNT > $ACCOUNT.json
+pipenv run python cloudmapper.py public --log_level DEBUG --account $ACCOUNT > $ACCOUNT.json
 
 echo "Running check on bad ports for $ACCOUNT"
 mv /opt/manheim_cloudmapper/run_port_check.py /opt/run_port_check.py
