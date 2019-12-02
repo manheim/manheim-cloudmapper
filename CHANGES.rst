@@ -4,7 +4,10 @@ Changelog
 0.1.8 (2019-12-02)
 ------------------
 
-* Only allow tuckernet ports on resources with application=t7t tag
+* Allow port exceptions based on tags
+* New environment variable `TAG_OK_PORTS` will have the format:
+   `TAG_OK_PORTS=tagName=tagValue:X,Y,Z[;...]` where X,Y,Z are the acceptable ports for resources ONLY with the specified tag
+* Multiple tag exceptions are permitted using the `;` delimiter
 
 0.1.7 (2019-11-25)
 ------------------

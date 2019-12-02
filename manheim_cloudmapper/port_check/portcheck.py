@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from pandas.io.json import json_normalize
 from .pagerdutyv1 import PagerDutyV1
 
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class PortCheck():
 
-    def __init__(self, ok_ports, account_name):
+    def __init__(self, ok_ports, account_name, tag_ok_ports):
         """
         Initialize PortCheck provider.
 
@@ -24,6 +25,7 @@ class PortCheck():
         self.account_name = account_name
         self.filename_in = account_name + '.json'
         self.pd = PagerDutyV1(account_name)
+        self.tag_ok_ports = tag_ok_ports
 
     def get_bad_ports(self, ports, ok_ports):
         """
@@ -56,17 +58,24 @@ class PortCheck():
 
         problem_str = ''
 
-        df = self._read_json()
-
+        # Load JSON into a dataframe, fill all NaN values with ''
+        df = self._read_json().fillna('')
         for row in df.itertuples():
-            if row.tags is not None:
-                for tag in row.tags:
-                    if tag["Key"] == "application" and tag["Value"] == "t7t":
-                        bad_ports_list = self.get_bad_ports(row.ports.split(','), self.ok_ports + ["943", "1194"])
-                        break
-            else:
-                bad_ports_list = self.get_bad_ports(row.ports.split(','), self.ok_ports)
+            acceptable_ports = self.ok_ports
 
+            # If the resource has tags, add tag exception ports
+            if row.tags != '':
+                for item in self.tag_ok_ports:
+                    m = re.match(r"(\w+)=(\w+):((\d*,*)*)", item)
+                    tagName = m.group(1)
+                    tagValue = m.group(2)
+                    tagPorts = m.group(3).split(",")
+
+                    for tag in row.tags:
+                        if tag["Key"] == tagName and tag["Value"] == tagValue:
+                            acceptable_ports += tagPorts
+
+            bad_ports_list = self.get_bad_ports(row.ports.split(','), acceptable_ports)
             bad_ports = ",".join(bad_ports_list)
 
             if bad_ports:
