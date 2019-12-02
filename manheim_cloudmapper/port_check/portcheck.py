@@ -25,7 +25,7 @@ class PortCheck():
         self.filename_in = account_name + '.json'
         self.pd = PagerDutyV1(account_name)
 
-    def get_bad_ports(self, ports):
+    def get_bad_ports(self, ports, ok_ports):
         """
         Compare the list of publicly acceible ports
         to the ports that are acceptable.
@@ -38,7 +38,7 @@ class PortCheck():
 
         bad_ports = []
         for port in ports:
-            if port not in self.ok_ports:
+            if port not in ok_ports:
                 bad_ports.append(port)
 
         return bad_ports
@@ -59,7 +59,14 @@ class PortCheck():
         df = self._read_json()
 
         for row in df.itertuples():
-            bad_ports_list = self.get_bad_ports(row.ports.split(','))
+            if row.tags is not None:
+                for tag in row.tags:
+                    if tag["Key"] == "application" and tag["Value"] == "t7t":
+                        bad_ports_list = self.get_bad_ports(row.ports.split(','), self.ok_ports + ["943", "1194"])
+                        break
+            else:
+                bad_ports_list = self.get_bad_ports(row.ports.split(','), self.ok_ports)
+
             bad_ports = ",".join(bad_ports_list)
 
             if bad_ports:
@@ -79,5 +86,5 @@ class PortCheck():
         with open(self.filename_in, 'r') as data:
             json_data = json.load(data)
             df = json_normalize(json_data)
-            df = df[['account', 'type', 'hostname', 'ports', 'arn']]
+            df = df[['account', 'type', 'hostname', 'ports', 'arn', 'tags']]
         return df

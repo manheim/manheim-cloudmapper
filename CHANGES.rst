@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.8 (2019-12-02)
+------------------
+
+* Only allow tuckernet ports on resources with application=t7t tag
+
 0.1.7 (2019-11-25)
 ------------------
 
