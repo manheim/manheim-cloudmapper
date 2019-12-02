@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.8 (2019-12-02)
+------------------
+
+* Clone 'boto_max_attempts' branch of manheim/cloudmapper to test parameter for boto attempts
+
 0.1.7 (2019-11-25)
 ------------------
 
