@@ -13,7 +13,7 @@ cat config.json
 
 if [ $SES_ENABLED == 'true' ]; then
     echo "Running cloudmapper.py collect on $ACCOUNT"
-    pipenv run python cloudmapper.py collect --account $ACCOUNT || true
+    pipenv run python cloudmapper.py collect --account $ACCOUNT --max-attempts $BOTO_MAX_ATTEMPTS || true
 
     echo "Running cloudmapper.py report on $ACCOUNT"
     pipenv run python cloudmapper.py report --account $ACCOUNT
