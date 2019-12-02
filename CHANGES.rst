@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.1.8 (2019-12-02)
+0.1.9 (2019-12-02)
 ------------------
 
 * Allow port exceptions based on tags
@@ -9,6 +9,11 @@ Changelog
    TAG_OK_PORTS=tagName=tagValue:X,Y,Z[;...] where X,Y,Z are the acceptable ports for resources ONLY with the specified tag
 * Example: TAG_OK_PORTS=application=t7t:943,1194;application=myapp:324
 * Multiple tag exceptions are permitted using the `;` delimiter
+
+0.1.8 (2019-12-02)
+------------------
+
+* Clone 'boto_max_attempts' branch of manheim/cloudmapper to test parameter for boto attempts
 
 0.1.7 (2019-11-25)
 ------------------
