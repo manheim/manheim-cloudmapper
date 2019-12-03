@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2.1 (2019-12-03)
+------------------
+
+* Releasing new tag to fix Docker hub build caching issue
+
 0.2.0 (2019-12-03)
 ------------------
 
