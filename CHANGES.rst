@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.2.0 (2019-12-03)
+------------------
+
+* Pull latest changes from 'boto_max_attempts' branch. Fixing type issue with Boto config.
+
+0.1.9 (2019-12-03)
+------------------
+
+* Clone latest 'boto_max_attempts' branch of manheim/cloudmapper.
+
 0.1.8 (2019-12-02)
 ------------------
 
