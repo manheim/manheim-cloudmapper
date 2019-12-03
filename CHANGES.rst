@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2.2 (2019-12-03)
+------------------
+
+* reverting changes to collect command. Collect command needs to run regardless of SES flag.
+
 0.2.1 (2019-12-03)
 ------------------
 
