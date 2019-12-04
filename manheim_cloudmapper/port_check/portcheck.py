@@ -3,7 +3,6 @@ import logging
 from pandas.io.json import json_normalize
 from .pagerdutyv1 import PagerDutyV1
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
