@@ -5,6 +5,7 @@ from manheim_cloudmapper.port_check.portcheck import PortCheck
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def check_bad_ports():
     logger.info('Starting port check')
     PortCheck(
