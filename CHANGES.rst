@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.2.3 (2019-12-04)
+------------------
+
+* Pull latest changes from 'add_logging' branch of 'manheim/cloudmapper'
+* Set log level to INFO
+
 0.2.2 (2019-12-03)
 ------------------
 
