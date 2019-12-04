@@ -3,6 +3,7 @@ import logging
 import urllib3
 import json
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

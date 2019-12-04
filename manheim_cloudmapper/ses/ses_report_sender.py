@@ -4,6 +4,7 @@ import logging
 from premailer import transform
 from .ses import SES
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
