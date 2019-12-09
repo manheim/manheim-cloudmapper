@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.1.9 (2019-12-02)
+0.2.5 (2019-12-09)
 ------------------
 
 * Allow port exceptions based on tags
@@ -9,6 +9,37 @@ Changelog
    TAG_OK_PORTS=tagName=tagValue:X,Y,Z[;...] where X,Y,Z are the acceptable ports for resources ONLY with the specified tag
 * Example: TAG_OK_PORTS=application=t7t:943,1194;application=myapp:324
 * Multiple tag exceptions are permitted using the `;` delimiter
+
+0.2.4 (2019-12-09)
+------------------
+
+* Pull latest changes from 'master' branch of 'manheim/cloudmapper'
+
+0.2.3 (2019-12-04)
+------------------
+
+* Pull latest changes from 'add_logging' branch of 'manheim/cloudmapper'
+* Set log level to INFO
+
+0.2.2 (2019-12-03)
+------------------
+
+* reverting changes to collect command. Collect command needs to run regardless of SES flag.
+
+0.2.1 (2019-12-03)
+------------------
+
+* Releasing new tag to fix Docker hub build caching issue
+
+0.2.0 (2019-12-03)
+------------------
+
+* Pull latest changes from 'boto_max_attempts' branch. Fixing type issue with Boto config.
+
+0.1.9 (2019-12-03)
+------------------
+
+* Clone latest 'boto_max_attempts' branch of manheim/cloudmapper.
 
 0.1.8 (2019-12-02)
 ------------------
