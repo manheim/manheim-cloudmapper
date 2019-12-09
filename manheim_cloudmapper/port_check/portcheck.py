@@ -75,7 +75,8 @@ class PortCheck():
                         if tag["Key"] == tagName and tag["Value"] == tagValue:
                             acceptable_ports += tagPorts
 
-            bad_ports_list = self.get_bad_ports(row.ports.split(','), acceptable_ports)
+            bad_ports_list = self.get_bad_ports(row.ports.split(','),
+                                                acceptable_ports)
             bad_ports = ",".join(bad_ports_list)
 
             if bad_ports:

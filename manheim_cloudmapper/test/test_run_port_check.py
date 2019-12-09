@@ -24,13 +24,15 @@ class TestRunPortCheck(object):
     @patch.dict(
         'os.environ',
         {'OK_PORTS': '80,443',
-         'ACCOUT': 'acct'},
+         'ACCOUT': 'acct',
+         'TAG_OK_PORTS': 'application=t7t:943,1194;application=myapp:324'},
         clear=True)
     def test_check_bad_ports(self):
         with patch('%s.PortCheck' % pbm) as m_pc:
             check_bad_ports()
 
             assert m_pc.mock_calls == [
-                call(['80', '443'], None),
+                call(['80', '443'], None, ['application=t7t:943,1194',
+                     'application=myapp:324']),
                 call().check_ports()
             ]

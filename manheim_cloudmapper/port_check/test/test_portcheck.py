@@ -27,7 +27,8 @@ class TestInit(object):
         clear=True
     )
     def test_all_options(self):
-        cls = PortCheck(ok_ports=['80', '443'], account_name='aName')
+        cls = PortCheck(ok_ports=['80', '443'], account_name='aName',
+                        tag_ok_ports='')
         assert cls.ok_ports == ['80', '443']
         assert cls.account_name == 'aName'
         assert cls.filename_in == 'aName.json'
@@ -44,18 +45,20 @@ class PortCheckTester(object):
         self.mock_pd = Mock()
         with patch('%s.PagerDutyV1' % pbm) as m_pd:
             m_pd.return_value = self.mock_pd
-            self.cls = PortCheck(['80', '443'], 'aName')
+            self.cls = PortCheck(['80', '443'], 'aName',
+                                 'application=t7t:943,1194;tagtest=myapp:324')
 
 
 class TestGetBadPorts(PortCheckTester):
 
     def test_get_bad_ports(self):
         bad_ports = self.cls.get_bad_ports(
-            ['80', '443', '1999', '22', '80', '432', '12435', '443'])
+            ['80', '443', '1999', '22', '80', '432', '12435', '443'],
+            self.cls.ok_ports)
         assert bad_ports == ['1999', '22', '432', '12435']
 
     def test_get_bad_ports_empty(self):
-        bad_ports = self.cls.get_bad_ports(['80', '443'])
+        bad_ports = self.cls.get_bad_ports(['80', '443'], self.cls.ok_ports)
         assert bad_ports == []
 
 
@@ -64,13 +67,16 @@ class TestCheckBadPorts(PortCheckTester):
     def test_check_bad_ports(self):
         json_data = ('[{"account": "acct","arn": "abc123","hostname": '
                      '"abc123.execute-api.us-east-1.amazonaws.com",'
-                     '"ports": "80,443,22,1999","type": "apigateway"},'
+                     '"ports": "80,443,22,1999","type": "apigateway",'
+                     '"tags": {"Key": "application", "Value": "t7t"}},'
                      '{"account": "acct","arn": "abc567","hostname": '
                      '"abc567.execute-api.us-east-1.amazonaws.com",'
-                     '"ports": "80,443,22,1999","type": "apigateway"},'
+                     '"ports": "80,443,22,1999","type": "apigateway",'
+                     '"tags": {"Key": "application", "Value": "t7t"}},'
                      '{"account": "acct","arn": "abc890","hostname": '
                      '"abc890.execute-api.us-east-1.amazonaws.com",'
-                     '"ports": "80,443,22,1999","type": "apigateway"}]')
+                     '"ports": "80,443,22,1999","type": "apigateway",'
+                     '"tags": {"Key": "application", "Value": "t7t"}}]')
 
         with patch('%s.open' % pbm,
                    mock_open(read_data=json_data), create=True) as m_open:
@@ -100,13 +106,16 @@ class TestCheckBadPorts(PortCheckTester):
     def test_check_bad_ports_empty(self):
         json_data = ('[{"account": "acct","arn": "abc123","hostname": '
                      '"abc123.execute-api.us-east-1.amazonaws.com",'
-                     '"ports": "80,443","type": "apigateway"},'
+                     '"ports": "80,443","type": "apigateway",'
+                     '"tags": {"Key": "application", "Value": "t7t"}},'
                      '{"account": "acct","arn": "abc567","hostname": '
                      '"abc567.execute-api.us-east-1.amazonaws.com",'
-                     '"ports": "80,443","type": "apigateway"},'
+                     '"ports": "80,443","type": "apigateway",'
+                     '"tags": {"Key": "application", "Value": "t7t"}},'
                      '{"account": "acct","arn": "abc890","hostname": '
                      '"abc890.execute-api.us-east-1.amazonaws.com",'
-                     '"ports": "80,443","type": "apigateway"}]')
+                     '"ports": "80,443","type": "apigateway",'
+                     '"tags": {"Key": "application", "Value": "t7t"}}]')
 
         with patch('%s.open' % pbm,
                    mock_open(read_data=json_data), create=True) as m_open:
