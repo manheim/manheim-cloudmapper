@@ -53,7 +53,7 @@ DATADOG_API_KEY=abc123456
 | ACCOUNT         | Name of AWS account where Cloudmapper will be running                                                                                           | aws-company-prod |
 | DATADOG_API_KEY | Datadog API key, for sending metrics                                                                                                            | abc123...        |
 | PD_SERVICE_KEY  | PagerDuty Service Key (Events V1 integration) for alerting on critical thresholds crossed                                                       | xyz890...        |
-| OK_PORTS        | A list of acceptable publicly accesible ports in string format                                                                                  | 80,443           |
+| OK_PORTS        | A list of acceptable publicly accessible ports in string format                                                                                  | 80,443           |
 | AWS_REGION      | AWS Region from which SES will send emails                                                                                                      | us-east-1        |
 | SES_ENABLED     | string to enable/disable email notification via SES.                                                                                            | true             |
 | SES_SENDER      | Email address of SES sender                                                                                                                     | foo@bar.com      |
