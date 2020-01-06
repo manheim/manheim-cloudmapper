@@ -214,7 +214,7 @@ class TestOnFailures(PagerDutyV1Tester):
             },
             'event_type': 'trigger',
             'description': 'cloudmapper in aName '
-                           'had publicly accesible ports'
+                           'had publicly accessible ports'
         }
         with patch.multiple(
             pb,
@@ -252,7 +252,7 @@ class TestOnFailures(PagerDutyV1Tester):
             },
             'event_type': 'trigger',
             'description': 'cloudmapper in '
-                           'had publicly accesible ports'
+                           'had publicly accessible ports'
         }
         with patch.multiple(
             pb,

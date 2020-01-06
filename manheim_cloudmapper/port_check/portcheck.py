@@ -32,7 +32,7 @@ class PortCheck():
 
         Return any ports that should not be accessible.
 
-        :param ports: List of publicly accesible ports
+        :param ports: List of publicly accessible ports
         :type ports: list
         """
 
@@ -45,10 +45,10 @@ class PortCheck():
 
     def check_ports(self):
         """
-        Check which ports are publicly accesible.
+        Check which ports are publicly accessible.
         Read the account.json file and parse through the open ports.
 
-        Alert PagerDuty if any publicly accesible ports are not
+        Alert PagerDuty if any publicly accessible ports are not
         in the list of acceptable ports.
 
         If no bad ports are found, resolve the issue in PagerDuty.

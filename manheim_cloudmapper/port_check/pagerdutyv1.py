@@ -126,6 +126,6 @@ class PagerDutyV1():
                                    ' %s' % exc.__repr__()
             data['details']['exception'] = exc.__repr__()
         else:
-            data['description'] += 'had publicly accesible ports'
+            data['description'] += 'had publicly accessible ports'
             data['details']['hosts_with_ports'] = problem_str
         self._send_event(self._service_key, data)
