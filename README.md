@@ -1,7 +1,7 @@
 manheim-cloudmapper
 =================
 
-[![TravisCI build badge](https://api.travis-ci.org/manheim/manheim-cloudmapper.png?branch=master)](https://travis-ci.org/manheim/manheim-cloudmapper)
+[![TravisCI build badge](https://api.travis-ci.com/manheim/manheim-cloudmapper.svg?branch=master)](https://travis-ci.com/github/manheim/manheim-cloudmapper)
 
 [![Docker Hub Build Status](https://img.shields.io/docker/cloud/build/manheim/manheim-cloudmapper.svg)](https://hub.docker.com/r/manheim/manheim-cloudmapper)
 
@@ -9,7 +9,7 @@ Manheim's Cloudmapper Docker image
 
 This project provides a Docker image for managing Manheim's cloudmapper automation. This project/repository is intended to be used (via the generated Docker image) alongside a terraform module which runs the Docker image in AWS ECS on a schedulued cycle.
 
-* TravisCI Builds: <https://travis-ci.org/manheim/manheim-cloudmapper>
+* TravisCI Builds: <https://travis-ci.com/github/manheim/manheim-cloudmapper>
 * Docker image: <https://hub.docker.com/r/manheim/manheim-cloudmapper>
 
 For documentation on the upstream cloudmapper project, please see <https://github.com/duo-labs/cloudmapper>
